@@ -1,0 +1,5 @@
+D:/NAKSHATRA/inspace_cansat_2026/gcs/app.gcs.system/build/Desktop_Qt_6_11_1_MinGW_64_bit-Debug/CMakeFiles/app.gcs.system.dir
+D:/NAKSHATRA/inspace_cansat_2026/gcs/app.gcs.system/build/Desktop_Qt_6_11_1_MinGW_64_bit-Debug/CMakeFiles/edit_cache.dir
+D:/NAKSHATRA/inspace_cansat_2026/gcs/app.gcs.system/build/Desktop_Qt_6_11_1_MinGW_64_bit-Debug/CMakeFiles/rebuild_cache.dir
+D:/NAKSHATRA/inspace_cansat_2026/gcs/app.gcs.system/build/Desktop_Qt_6_11_1_MinGW_64_bit-Debug/CMakeFiles/app.gcs.system_autogen_timestamp_deps.dir
+D:/NAKSHATRA/inspace_cansat_2026/gcs/app.gcs.system/build/Desktop_Qt_6_11_1_MinGW_64_bit-Debug/CMakeFiles/app.gcs.system_autogen.dir
