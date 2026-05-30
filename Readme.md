@@ -1,3 +1,12 @@
+### Project Overview
+This repository contains the Ground Control System (GCS) software for the VNT CanSat 2026 mission. The GCS is a desktop Qt application that:
+Ingests raw binary telemetry frames arriving over a virtual COM/USB serial port from a LoRa receiver module.
+Validates each frame using CRC-16 (CCITT) integrity checks.
+Renders live charts for altitude, temperature, pressure, and 3-axis accelerometer data.
+Logs every validated packet to a timestamped `.csv` file for post-flight analysis.
+Hardware chain: `STM32 + BMP280/IMU` → `LoRa TX` RF `LoRa RX` → `USB-UART bridge` → this software.
+
+
 ### Project Architecture
 app.gcs.system/
 ├── .gitignore
@@ -44,10 +53,74 @@ app.gcs.system/
    * **UI Thread:** Render widgets, gauges, state matrices, and dynamic charts without frame drops.
 
 ---
+### Prerequisites & Toolchain
+**1. C++ Compiler**
+Windows	MinGW-w64 (GCC 13+)	Bundled with Qt installer
+Linux	GCC 12+ or Clang 15+	`sudo apt install build-essential`
+macOS	Clang (Xcode 14+)	`xcode-select --install`
+C++17 standard is required (`CMAKE_CXX_STANDARD 17` is already set in `CMakeLists.txt`).
+
+**2. Qt 6 Framework**
+Download from https://www.qt.io/download-open-source.
+Required Qt modules (select during installation):
+`Qt6::Core`
+`Qt6::Gui`
+`Qt6::Widgets`
+`Qt6::SerialPort`
+`Qt6::Charts`
+Minimum version: Qt 6.2 LTS. The build folder in this repo was generated with Qt 6.11.1 MinGW 64-bit.
+
+**3. CMake**
+Version 3.16 or newer is required.
+```bash
+# Linux
+sudo apt install cmake
+
+# macOS
+brew install cmake
+
+# Windows — download installer from https://cmake.org/download/
+```
+---
+## Quick Start — Clone & Build
+```bash
+**1. Clone the repository**
+git clone https://github.com/official-vnt/Cansat2026-gcs-system.git
+cd Cansat2026-gcs-system
+
+**2. Configure with CMake (replace path to your Qt install)**
+cmake -B build \
+      -DCMAKE_PREFIX_PATH="/path/to/Qt/6.x.x/gcc_64" \
+      -DCMAKE_BUILD_TYPE=Debug
+
+**Windows example (MinGW):**
+# cmake -B build -DCMAKE_PREFIX_PATH="C:/Qt/6.11.1/mingw_64" -G "MinGW Makefiles"
+
+**3. Build**
+cmake --build build --parallel
+
+**4. Run**
+./build/app.gcs.system          # Linux/macOS
+build\app.gcs.system.exe        # Windows
+```
+> **Qt Creator shortcut:** Open `CMakeLists.txt` directly in Qt Creator → select your kit → click the green Run button. The IDE handles CMake configuration automatically.**
+
+---
+## Step 3 — Launch the GCS dashboard
+Start the built executable and, in the port selector, choose `/dev/pts/4` (or `COM6` on Windows) at 115200 baud.
+The dashboard will immediately start rendering live charts fed by the simulated data.
+---
+1. Transmitter board. Telemetry frames will begin appearing within 1–2 seconds.
+2. Logged CSV files are written to a `logs/` folder in the working directory, named by session timestamp: `session_20260530Running With Hardware
+3. Connect the LoRa RX module via USB-UART bridge to your workstation.
+4. Confirm the COM port appears in your OS (e.g., `/dev/ttyUSB0` on Linux, `COM3` on Windows).
+5. Launch `app.gcs.system` and select the correct port at 115200 baud (or match your firmware's baud rate).
+6. Power on the STM32_143022.csv`.
+---
 
 ## 📅 Phased Execution Workflow
 
-This project is executed in **5 distinct phases** over a 4-week timeline. Do not move to the next phase until the verification checklist for the current phase passes completely.
+This project is executed in **5 distinct phases**. 
 
 ### Phase 1: Data Contract & Infrastructure Setup
 * **Objective:** Establish the baseline code architecture, communication boundaries, and packet specifications.
@@ -89,23 +162,35 @@ This project is executed in **5 distinct phases** over a 4-week timeline. Do not
 
 To ensure interoperability, the STM32 (Transmitter) and the Qt Dashboard (Receiver) must strictly adhere to the exact binary structure mapped below.
 
-| Offset (Byte) | Field Name | Data Type | Size (Bytes) | Description / Range |
-| :--- | :--- | :--- | :--- | :--- |
-| `0x00` | `START_FRAME` | `uint16_t` | 2 | Sync Marker: Always `0xAA55` |
-| `0x02` | `PACKET_ID` | `uint32_t` | 4 | Monotonically incrementing packet counter |
-| `0x06` | `TIMESTAMP` | `uint32_t` | 4 | System uptime in milliseconds since boot |
-| `0x0A` | `TEMPERATURE` | `float` | 4 | Sensor internal temperature in °C |
-| `0x0E` | `PRESSURE` | `float` | 4 | Atmospheric pressure in Pascals (Pa) |
-| `0x12` | `ALTITUDE` | `float` | 4 | Calculated altitude relative to ground level (meters) |
-| `0x16` | `ACCEL_X` | `float` | 4 | Accelerometer X-axis force in $g$ |
-| `0x1A` | `ACCEL_Y` | `float` | 4 | Accelerometer Y-axis force in $g$ |
-| `0x1E` | `ACCEL_Z` | `float` | 4 | Accelerometer Z-axis force in $g$ |
-| `0x22` | `RSSI` | `int16_t` | 2 | Received Signal Strength Indicator (dBm) |
-| `0x24` | `SNR` | `int16_t` | 2 | Signal-to-Noise Ratio (dB) |
-| `0x26` | `STATUS_BYTE` | `uint8_t` | 1 | System error masking bitmap flags |
-| `0x27` | `CRC_CHECKSUM` | `uint16_t` | 2 | CRC-16 (CCITT) checksum value calculated over bytes `0x00` to `0x26` |
+| Offset (Byte) | Field Name     | Data Type  | Size (Bytes) | Description                    |
+| ------------- | -------------- | ---------- | ------------ | ------------------------------ |
+| `0x00`        | `START_FRAME`  | `uint16_t` | 2            | Sync Marker: Always `0xAA55`   |
+| `0x02`        | `TEAM_ID`      | `char[8]`  | 8            | Team Identifier (ASCII String) |
+| `0x0A`        | `TIME`         | `int32_t`  | 4            | Mission elapsed time (seconds) |
+| `0x0E`        | `PACKET_COUNT` | `uint16_t` | 2            | Incrementing packet counter    |
+| `0x10`        | `ALTITUDE`     | `float`    | 4            | Altitude (m)                   |
+| `0x14`        | `PRESSURE`     | `float`    | 4            | Pressure (Pa)                  |
+| `0x18`        | `TEMPERATURE`  | `float`    | 4            | Temperature (°C)               |
+| `0x1C`        | `VOLTAGE`      | `float`    | 4            | Battery Voltage (V)            |
+| `0x20`        | `LATITUDE`     | `double`   | 8            | GPS Latitude                   |
+| `0x28`        | `LONGITUDE`    | `double`   | 8            | GPS Longitude                  |
+| `0x30`        | `GPS_ALTITUDE` | `float`    | 4            | GPS Altitude (m)               |
+| `0x34`        | `SATELLITES`   | `int32_t`  | 4            | Number of GPS Satellites       |
+| `0x38`        | `ACCEL_X`      | `float`    | 4            | Acceleration X (g)             |
+| `0x3C`        | `ACCEL_Y`      | `float`    | 4            | Acceleration Y (g)             |
+| `0x40`        | `ACCEL_Z`      | `float`    | 4            | Acceleration Z (g)             |
+| `0x44`        | `GYRO_X`       | `float`    | 4            | Gyroscope X (°/s)              |
+| `0x48`        | `GYRO_Y`       | `float`    | 4            | Gyroscope Y (°/s)              |
+| `0x4C`        | `GYRO_Z`       | `float`    | 4            | Gyroscope Z (°/s)              |
+| `0x50`        | `STATE`        | `char[16]` | 16           | Current Mission State          |
+| `0x60`        | `CRC_CHECKSUM` | `uint16_t` | 2            | CRC-16 (CCITT)                 |
 
-**Total Packet Payload Weight:** 41 Bytes
+**Total Packet Payload Weight:** 
+| Component             | Size         |
+| --------------------- | ------------ |
+| Payload               | 96 Bytes     |
+| CRC                   | 2 Bytes      |
+| **Total Packet Size** | **98 Bytes** |
 
 ---
 
@@ -121,38 +206,16 @@ Ensure you have the required toolchains installed and configured on your host wo
   * *Linux/macOS:* Install `socat` via package managers (`sudo apt install socat`).
   * *Windows:* Install [com0com](https://sourceforge.net/projects/com0com/) or an equivalent null-modem emulator.
 
-### Step 2: C++ Telemetry Frame Implementation
-Declare the matching telemetry block layout explicitly inside a shared configuration header (`TelemetryDef.h`) to guarantee byte alignment across architectures:
-
-```cpp
-#pragma once
-#include <cstdint>
-
-// Force compilers to prevent byte padding optimized for host processors
-#pragma pack(push, 1)
-struct TelemetryPacket {
-    uint16_t start_frame;   // 0xAA55
-    uint32_t packet_id;
-    uint32_t timestamp;
-    float    temperature;
-    float    pressure;
-    float    altitude;
-    float    accel_x;
-    float    accel_y;
-    float    accel_z;
-    int16_t  rssi;
-    int16_t  snr;
-    uint8_t  status_byte;
-    uint16_t crc;
-};
-#pragma pack(pop)
-
-Step 3: Implement Multi-Threaded Serial Ingestion Worker
-Write a non-blocking consumer model using native Qt threading design to intercept serial data streams safely without degrading frontend layout frames.
-
-Step 4: Spawning Worker Threads within Main Window Core
-Instantiate the thread pipeline safely when initialization flags run:
-
-Step 5: Constructing The Testing Mock Simulator
-Create a Python validation script (simulator.py) to feed dummy telemetry bytes over physical testing targets for standalone debugging sessions:
+## Troubleshooting
+**CMake cannot find Qt6:**
+Set `CMAKE_PREFIX_PATH` to your Qt installation directory, e.g. `-DCMAKE_PREFIX_PATH="C:/Qt/6.11.1/mingw_64"`.
+**Serial port permission denied (Linux):**
+Add your user to the `dialout` group: `sudo usermod -aG dialout $USER` and log out/in.
+**All packets fail CRC:**
+Confirm the CRC polynomial and initial value in `DataParser` exactly match the firmware. Also check endianness — the STM32 is little-endian and so is x86/x64, but verify `#pragma pack(push, 1)` is active on both sides.
+**Charts freeze or lag:**
+Ensure chart updates are driven by the `QTimer` at 30 Hz rather than directly from the `packetReady` signal. High packet rates will saturate the GUI thread if connected directly.
+**Simulator not sending bytes:**
+Check that you are writing to the correct end of the virtual COM pair (the write end, not the read end). The GCS dashboard must be connected to the other end.
+---
 
