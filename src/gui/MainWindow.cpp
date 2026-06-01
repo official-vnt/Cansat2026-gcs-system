@@ -1,9 +1,12 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
+#include "CommandDef.h"
 
 #include <QMessageBox>
 #include <QSerialPortInfo>
 #include <QDateTime>
+#include <QTimer>
+#include <QSizePolicy>
 #include <QFrame>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -14,6 +17,11 @@
 #include <QQuickWidget>
 #include <QQuickItem>
 #include <QUrl>
+#include <QFileDialog>
+#include <QStandardPaths>
+#include <QProgressBar>
+#include <QFile>
+#include <QTextStream>
 #include <cmath>
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -131,6 +139,30 @@ MainWindow::MainWindow(QWidget *parent)
         "  color: #8b949e;"
         "  border-top: 1px solid #21262d;"
         "}"
+        // Scroll areas — transparent so underlying dark background shows through
+        "QScrollArea {"
+        "  background: transparent;"
+        "  border: none;"
+        "}"
+        "QScrollArea > QWidget > QWidget {"
+        "  background: transparent;"
+        "}"
+        "QScrollBar:vertical {"
+        "  background: #0d1117;"
+        "  width: 6px;"
+        "  border-radius: 3px;"
+        "}"
+        "QScrollBar::handle:vertical {"
+        "  background: #30363d;"
+        "  border-radius: 3px;"
+        "  min-height: 20px;"
+        "}"
+        "QScrollBar::handle:vertical:hover {"
+        "  background: #58a6ff;"
+        "}"
+        "QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {"
+        "  height: 0px;"
+        "}"
     );
 
     this->setWindowTitle("NAKSHATRA GCS - CanSat Ground Control Station");
@@ -151,9 +183,14 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->statusLabel->setText("<span style='color:#f85149; font-weight:bold;'>○ Disconnected</span>");
 
+    setupTopRibbon();
     setupDashboardCards();
     setupLeftPanel();
     setupUiGraphs();
+    setupCommandCenter();
+    setupRecoveryPanel();
+    setupLoggingPanel();
+    setupStatePanel();
     setupConnections();
 
     m_worker->moveToThread(&m_serialThread);
@@ -193,18 +230,21 @@ void MainWindow::setupDashboardCards()
         card->setObjectName("telemetryCard");
 
         QVBoxLayout *layout = new QVBoxLayout(card);
-        layout->setContentsMargins(10, 8, 10, 8);
-        layout->setSpacing(3);
+        layout->setContentsMargins(8, 6, 8, 6);
+        layout->setSpacing(2);
 
         QLabel *titleLabel = new QLabel(title, card);
         titleLabel->setStyleSheet(
             "font-size: 9px; font-weight: 800; color: #8b949e;"
-            " text-transform: uppercase; letter-spacing: 0.5px;");
+            " letter-spacing: 0.5px;");
 
         valLabel = new QLabel(initVal, card);
         valLabel->setStyleSheet(
             "font-family: 'Consolas', 'Courier New', monospace;"
-            " font-size: 15px; font-weight: bold; color: #58a6ff;");
+            " font-size: 13px; font-weight: bold; color: #58a6ff;");
+        // Prevent the label from stretching the card horizontally
+        valLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+        valLabel->setMinimumWidth(0);
 
         layout->addWidget(titleLabel);
         layout->addWidget(valLabel);
@@ -353,19 +393,10 @@ void MainWindow::setupLeftPanel()
         return qMakePair(group, layout);
     };
 
-    auto createRow = [](const QString &labelTxt, QLabel *&valLabel, QWidget *parent) {
-        QHBoxLayout *row = new QHBoxLayout();
-        QLabel *nameLbl = new QLabel(labelTxt, parent);
-        valLabel = new QLabel("-", parent);
-        valLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
-        valLabel->setStyleSheet("font-weight: bold; color: #58a6ff;");
-        row->addWidget(nameLbl);
-        row->addWidget(valLabel);
-        return row;
-    };
-
     // 1. 3D Orientation Card (Top)
     auto orientPair = createLeftCard("3D ORIENTATION", ui->leftGroupBox);
+    
+    QHBoxLayout *orientLayout = new QHBoxLayout();
     
     // QtQuick3D viewer
     m_orientation3DWidget = new QQuickWidget(orientPair.first);
@@ -373,46 +404,67 @@ void MainWindow::setupLeftPanel()
     m_orientation3DWidget->setSource(QUrl::fromLocalFile("d:/NAKSHATRA/inspace_cansat_2026/gcs/app.gcs.system/src/gui/Orientation3D.qml"));
     m_orientation3DWidget->setMinimumHeight(150);
     
-    // Add to layout with stretch=1 so it shares space equally
-    orientPair.second->addWidget(m_orientation3DWidget, 1);
+    orientLayout->addWidget(m_orientation3DWidget, 2);
     
-    orientPair.second->addLayout(createRow("Roll (°):", m_lblOrientRoll, orientPair.first));
-    orientPair.second->addLayout(createRow("Pitch (°):", m_lblOrientPitch, orientPair.first));
-    orientPair.second->addLayout(createRow("Yaw Rate (°/s):", m_lblOrientYawRate, orientPair.first));
-
+    QVBoxLayout *orientTextLayout = new QVBoxLayout();
+    
+    auto createValLabel = [](const QString &text, QLabel *&valLabel, QWidget *parent) {
+        QLabel *nameLbl = new QLabel(text, parent);
+        nameLbl->setStyleSheet("color: #8b949e; font-size: 10px; font-weight: bold; background: transparent;");
+        valLabel = new QLabel("-", parent);
+        valLabel->setStyleSheet("color: #58a6ff; font-weight: bold; font-size: 12px; background: transparent;");
+        QVBoxLayout *v = new QVBoxLayout();
+        v->setSpacing(0);
+        v->addWidget(nameLbl);
+        v->addWidget(valLabel);
+        return v;
+    };
+    
+    orientTextLayout->addLayout(createValLabel("Roll (°)", m_lblOrientRoll, orientPair.first));
+    orientTextLayout->addLayout(createValLabel("Pitch (°)", m_lblOrientPitch, orientPair.first));
+    orientTextLayout->addLayout(createValLabel("Yaw Rate (°/s)", m_lblOrientYawRate, orientPair.first));
+    orientTextLayout->addStretch();
+    
+    orientLayout->addLayout(orientTextLayout, 1);
+    orientPair.second->addLayout(orientLayout);
     ui->leftPanelLayout->addWidget(orientPair.first, 1);
 
-
-    // 2. GPS Card + Map Placeholder (Middle)
+    // 2. GPS Card + Map (Middle)
     auto gpsPair = createLeftCard("GPS LOCATION", ui->leftGroupBox);
-    gpsPair.second->addLayout(createRow("Latitude:", m_lblLeftGpsLat, gpsPair.first));
-    gpsPair.second->addLayout(createRow("Longitude:", m_lblLeftGpsLon, gpsPair.first));
-    gpsPair.second->addLayout(createRow("Altitude (m):", m_lblLeftGpsAlt, gpsPair.first));
-    gpsPair.second->addLayout(createRow("Satellites:", m_lblLeftGpsSats, gpsPair.first));
     
-    m_lblMapPlaceholder = new QLabel("GPS MAP\n(API LINK PENDING)", gpsPair.first);
-    m_lblMapPlaceholder->setAlignment(Qt::AlignCenter);
-    m_lblMapPlaceholder->setStyleSheet(
-        "background-color: #0d1117; "
-        "border: 1px dashed #30363d; "
-        "border-radius: 4px; "
-        "color: #8b949e; "
-        "font-weight: bold;"
-    );
-    m_lblMapPlaceholder->setMinimumHeight(150);
-    gpsPair.second->addWidget(m_lblMapPlaceholder, 1);
+    m_mapWidget = new MapWidget(gpsPair.first);
+    m_mapWidget->setMinimumHeight(150);
     
+    // Overlay for GPS data
+    QWidget *gpsOverlay = new QWidget(m_mapWidget);
+    gpsOverlay->setStyleSheet("background-color: rgba(13, 17, 23, 180); border-radius: 4px;");
+    QHBoxLayout *gpsOverlayLayout = new QHBoxLayout(gpsOverlay);
+    gpsOverlayLayout->setContentsMargins(5, 5, 5, 5);
+    
+    auto createGpsLabel = [](const QString &text, QLabel *&valLabel, QWidget *parent) {
+        QLabel *nameLbl = new QLabel(text, parent);
+        nameLbl->setStyleSheet("color: #8b949e; font-size: 9px; font-weight: bold; background: transparent; border: none;");
+        valLabel = new QLabel("-", parent);
+        valLabel->setStyleSheet("color: #58a6ff; font-weight: bold; font-size: 11px; background: transparent; border: none;");
+        QVBoxLayout *v = new QVBoxLayout();
+        v->setSpacing(0);
+        v->addWidget(nameLbl);
+        v->addWidget(valLabel);
+        return v;
+    };
+    
+    gpsOverlayLayout->addLayout(createGpsLabel("Lat", m_lblLeftGpsLat, gpsOverlay));
+    gpsOverlayLayout->addLayout(createGpsLabel("Lon", m_lblLeftGpsLon, gpsOverlay));
+    gpsOverlayLayout->addLayout(createGpsLabel("Alt", m_lblLeftGpsAlt, gpsOverlay));
+    gpsOverlayLayout->addLayout(createGpsLabel("Sat", m_lblLeftGpsSats, gpsOverlay));
+    
+    // Create a layout in MapWidget to position the overlay at the top
+    QVBoxLayout *mapLayout = new QVBoxLayout(m_mapWidget);
+    mapLayout->setContentsMargins(5, 5, 5, 5);
+    mapLayout->addWidget(gpsOverlay, 0, Qt::AlignTop);
+    
+    gpsPair.second->addWidget(m_mapWidget, 1);
     ui->leftPanelLayout->addWidget(gpsPair.first, 1);
-
-
-    // 3. Mission State Card (Bottom)
-    auto statePair = createLeftCard("CANSAT STATE", ui->leftGroupBox);
-    m_lblLeftState = new QLabel("OFFLINE", statePair.first);
-    m_lblLeftState->setAlignment(Qt::AlignCenter);
-    m_lblLeftState->setStyleSheet("font-size: 28px; font-weight: bold; color: #f85149;");
-    statePair.second->addWidget(m_lblLeftState, 1);
-
-    ui->leftPanelLayout->addWidget(statePair.first, 1);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -667,6 +719,11 @@ void MainWindow::setupConnections()
     connect(m_worker, &SerialWorker::errorOccurred, this, &MainWindow::onErrorOccurred);
     connect(m_worker, &SerialWorker::dataReady,   m_parser, &DataParser::parseData);
     connect(m_parser, &DataParser::packetReceived,  this, &MainWindow::onPacketReceived);
+
+    // Mission timer
+    connect(&m_missionTimer, &QTimer::timeout, this, &MainWindow::onMissionTimerTick);
+
+
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -682,7 +739,7 @@ void MainWindow::onConnectClicked()
         return;
     }
 
-    m_logger->startLogging(QCoreApplication::applicationDirPath() + "/logs");
+    m_logger->startLogging("D:/NAKSHATRA/inspace_cansat_2026/gcs/app.gcs.system/datalogging");
 
     QMetaObject::invokeMethod(m_worker, "openPort", Qt::QueuedConnection,
                                Q_ARG(QString, portName),
@@ -704,6 +761,11 @@ void MainWindow::onPortOpened()
     ui->statusLabel->setText("<span style='color:#2ea043; font-weight:bold;'>● Connected</span>");
 
     m_packetCount = 0;
+    m_packetStored = 0;
+
+    // Start mission timer
+    m_missionSeconds = 0;
+    m_missionTimer.start(1000);
 
     // Clear all series on new session
     m_altTimeSeries->clear();
@@ -719,6 +781,11 @@ void MainWindow::onPortOpened()
 
     // Reset axes
     m_altVoltAxisX->setRange(0, 100);
+
+    // Update logging panel
+    if (m_lblRecordingDot)      m_lblRecordingDot->setText("● RECORDING");
+    if (m_lblPacketsStored)     m_lblPacketsStored->setText("0");
+    if (m_lblStorageRemaining)  m_lblStorageRemaining->setText("--");
 }
 
 void MainWindow::onPortClosed()
@@ -728,6 +795,12 @@ void MainWindow::onPortClosed()
     ui->portComboBox->setEnabled(true);
     ui->baudComboBox->setEnabled(true);
     ui->statusLabel->setText("<span style='color:#f85149; font-weight:bold;'>○ Disconnected</span>");
+
+    // Stop mission timer
+    m_missionTimer.stop();
+
+    // Update recording indicator
+    if (m_lblRecordingDot) m_lblRecordingDot->setText("◌ STOPPED");
 }
 
 void MainWindow::onPacketReceived(const TelemetryPacket &packet)
@@ -738,7 +811,6 @@ void MainWindow::onPacketReceived(const TelemetryPacket &packet)
     if (m_lblTeamId)        m_lblTeamId->setText(packet.teamID);
     if (ui->lblPacketId)    ui->lblPacketId->setText(QString::number(packet.packetCount));
     if (ui->lblTimestamp)   ui->lblTimestamp->setText(QString::number(packet.time) + " ms");
-    if (m_lblState)         m_lblState->setText(packet.state);
     if (m_lblAltitudeVal)   m_lblAltitudeVal->setText(QString::number(packet.altitude,     'f', 1) + " m");
     if (m_lblTemperatureVal)m_lblTemperatureVal->setText(QString::number(packet.temperature,'f', 1) + " °C");
     if (m_lblPressureVal)   m_lblPressureVal->setText(QString::number(packet.pressure,     'f', 0) + " Pa");
@@ -757,7 +829,38 @@ void MainWindow::onPacketReceived(const TelemetryPacket &packet)
     if (m_lblGyroZVal)  m_lblGyroZVal->setText(QString::number(packet.gyro.z(), 'f', 2));
 
     // ── Orientation Math & Left Panel Updates ───────────────────────────────
-    if (m_lblLeftState) m_lblLeftState->setText(packet.state);
+    
+    // State machine logic
+    if (m_currentStateSequence == 0 && packet.altitude >= 1000.0) {
+        m_currentStateSequence = 1;
+    } else if (m_currentStateSequence == 1 && packet.accel.z() < 0.0) {
+        m_currentStateSequence = 2;
+    } else if (m_currentStateSequence == 2 && packet.altitude <= 600.0) {
+        m_currentStateSequence = 3;
+    } else if (m_currentStateSequence == 3 && packet.accel.z() < 0.0) {
+        m_currentStateSequence = 4;
+    } else if (m_currentStateSequence == 4 && qAbs(packet.accel.z()) < 0.1 && qAbs(packet.accel.x()) < 0.1 && qAbs(packet.accel.y()) < 0.1) {
+        m_currentStateSequence = 5;
+    }
+
+    auto updateStateStyle = [this](QLabel* lbl, int index) {
+        if (!lbl) return;
+        if (m_currentStateSequence == index) {
+            lbl->setStyleSheet("font-size: 13px; font-weight: bold; color: #3fb950; border: 1px solid #3fb950; border-radius: 4px; padding: 4px; background: rgba(63,185,80,0.1);");
+        } else {
+            lbl->setStyleSheet("font-size: 11px; font-weight: bold; color: #484f58; padding: 2px; border: none; background: transparent;");
+        }
+    };
+
+    updateStateStyle(m_lblStateLaunch, 0);
+    updateStateStyle(m_lblStateDep1, 1);
+    updateStateStyle(m_lblStateDescent, 2);
+    updateStateStyle(m_lblStateDep2, 3);
+    updateStateStyle(m_lblStateDescent2, 4);
+    updateStateStyle(m_lblStateLand, 5);
+
+    const QString stateNames[] = {"LAUNCH", "DEPLOYMENT 1", "DESCENT", "DEPLOYMENT 2", "DESCENT", "LAND"};
+    if (m_lblState) m_lblState->setText(stateNames[m_currentStateSequence]);
     
     // Calculate Roll and Pitch
     // Roll = atan2(Y, Z) * 180/PI
@@ -787,6 +890,25 @@ void MainWindow::onPacketReceived(const TelemetryPacket &packet)
     if (m_lblLeftGpsLon) m_lblLeftGpsLon->setText(QString::number(packet.longitude, 'f', 6));
     if (m_lblLeftGpsAlt) m_lblLeftGpsAlt->setText(QString::number(packet.gpsAltitude, 'f', 1));
     if (m_lblLeftGpsSats) m_lblLeftGpsSats->setText(QString::number(packet.satellites));
+    
+    if (m_mapWidget) {
+        m_mapWidget->setCoordinate(packet.latitude, packet.longitude);
+    }
+
+    // ── State indicator + recovery detection ────────────────────────────────
+    if ((packet.state == "LANDED" || packet.state == "RECOVERY MODE") && !m_landed) {
+        m_landed    = true;
+        m_landingLat = packet.latitude;
+        m_landingLon = packet.longitude;
+        showRecoveryPanel(true);
+    }
+    if (m_lblRecoveryLat)   m_lblRecoveryLat->setText(QString::number(packet.latitude,  'f', 6));
+    if (m_lblRecoveryLon)   m_lblRecoveryLon->setText(QString::number(packet.longitude, 'f', 6));
+    if (m_lblLastTelemetry) m_lblLastTelemetry->setText(QDateTime::currentDateTime().toString("hh:mm:ss"));
+
+    // ── Update logging panel counts ──────────────────────────────────────────
+    m_packetStored++;
+    if (m_lblPacketsStored) m_lblPacketsStored->setText(QString::number(m_packetStored));
 
     m_logger->logPacket(packet);
     updateCharts(packet);
@@ -879,4 +1001,370 @@ void MainWindow::onErrorOccurred(const QString &error)
 {
     QMessageBox::critical(this, "Serial Error", error);
     onPortClosed();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  Top Ribbon — style the pre-existing UI widgets from the .ui file
+// ─────────────────────────────────────────────────────────────────────────────
+void MainWindow::setupTopRibbon()
+{
+    const QString ribbonStyle =
+        "QWidget#topRibbon {"
+        "  background-color: #161b22;"
+        "  border-bottom: 1px solid #30363d;"
+        "}"
+        "QLabel#lblTeamIdBadge {"
+        "  color: #f0883e;"
+        "  font-family: 'Consolas', monospace;"
+        "  font-size: 13px;"
+        "  font-weight: bold;"
+        "  letter-spacing: 1px;"
+        "  padding: 0 8px;"
+        "}"
+        "QLabel#lblMissionTimer {"
+        "  color: #58a6ff;"
+        "  font-family: 'Consolas', monospace;"
+        "  font-size: 20px;"
+        "  font-weight: bold;"
+        "  letter-spacing: 2px;"
+        "  min-width: 110px;"
+        "}"
+        "QLabel#lblTimerCaption, QLabel#lblLinkCaption, "
+        "QLabel#lblRssiCaption, QLabel#lblSnrCaption {"
+        "  color: #8b949e;"
+        "  font-size: 9px;"
+        "  font-weight: bold;"
+        "  text-transform: uppercase;"
+        "  letter-spacing: 1px;"
+        "}"
+        "QLabel#lblRssiVal, QLabel#lblSnrVal {"
+        "  color: #3fb950;"
+        "  font-family: 'Consolas', monospace;"
+        "  font-size: 12px;"
+        "  font-weight: bold;"
+        "  min-width: 60px;"
+        "}"
+        "QFrame[frameShape='5'] {"   // VLine separators
+        "  color: #30363d;"
+        "  max-width: 1px;"
+        "}"
+        "QProgressBar#linkQualityBar {"
+        "  background-color: #0d1117;"
+        "  border: 1px solid #30363d;"
+        "  border-radius: 3px;"
+        "  height: 8px;"
+        "}"
+        "QProgressBar#linkQualityBar::chunk {"
+        "  background: qlineargradient(x1:0,y1:0,x2:1,y2:0,"
+        "    stop:0 #238636, stop:0.6 #2ea043, stop:1 #3fb950);"
+        "  border-radius: 3px;"
+        "}";
+
+    ui->topRibbon->setStyleSheet(ribbonStyle);
+
+    // Cache pointer to the mission timer label
+    m_lblMissionTimer = ui->lblMissionTimer;
+    m_linkQualityBar  = ui->linkQualityBar;
+    m_lblRssi         = ui->lblRssiVal;
+    m_lblSnr          = ui->lblSnrVal;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  Command Center — 3×3 compact grid inside commandGroupBox
+// ─────────────────────────────────────────────────────────────────────────────
+void MainWindow::setupCommandCenter()
+{
+    QGridLayout *grid = ui->commandPanelLayout;
+    grid->setSpacing(3);
+
+    const QString btnBase =
+        "QPushButton {"
+        "  border-radius: 4px;"
+        "  padding: 5px 4px;"
+        "  font-size: 9px;"
+        "  font-weight: bold;"
+        "  font-family: 'Segoe UI';"
+        "  text-align: center;"
+        "}"
+        "QPushButton:hover { opacity:0.85; }"
+        "QPushButton:disabled { color: #484f58; border-color: #30363d; background: transparent; }";
+
+    const auto& cmds = CommandRegistry::commands();
+    int col = 0, row = 0;
+    
+    for (const CommandDefinition& d : cmds) {
+        QPushButton *btn = new QPushButton(d.label, ui->commandGroupBox);
+        btn->setEnabled(d.enabled);
+        if (d.enabled) {
+            btn->setStyleSheet(btnBase +
+                QString("QPushButton{color:%1;background:%2;border:1px solid %1;}")
+                    .arg(d.color, d.bgColor));
+        } else {
+            btn->setStyleSheet(btnBase);
+        }
+        
+        m_cmdButtons.append(btn);
+        grid->addWidget(btn, row, col);
+        
+        // Dynamically connect the button to send the serial command
+        connect(btn, &QPushButton::clicked, this, [this, d]() {
+            if (d.needsConfirm) {
+                if (!confirmAction(d.label.trimmed())) return;
+            }
+            
+            // Send the command via the serial worker thread
+            QByteArray cmdBytes = (d.serialCmd + "\n").toUtf8();
+            QMetaObject::invokeMethod(m_worker, "sendData", Qt::QueuedConnection,
+                                      Q_ARG(QByteArray, cmdBytes));
+            
+            // Provide visual feedback
+            QMessageBox::information(this, "Command Sent", QString("Sent: %1").arg(d.serialCmd));
+        });
+
+        if (++col == 3) { col = 0; ++row; }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  Recovery Panel — built into recoveryGroupBox, hidden until landing
+// ─────────────────────────────────────────────────────────────────────────────
+void MainWindow::setupRecoveryPanel()
+{
+    QVBoxLayout *layout = ui->recoveryPanelLayout;
+
+    const QString cardStyle =
+        "QLabel { color: #c9d1d9; font-size: 12px; }"
+        "QLabel[class='val'] { color: #58a6ff; font-family: 'Consolas'; font-weight: bold; }";
+
+    auto makeRow = [&](const QString &label, QLabel *&val) {
+        QHBoxLayout *row = new QHBoxLayout();
+        QLabel *lbl = new QLabel(label, ui->recoveryGroupBox);
+        lbl->setStyleSheet("color:#8b949e; font-size:11px;");
+        val = new QLabel("--", ui->recoveryGroupBox);
+        val->setStyleSheet("color:#58a6ff; font-family:'Consolas'; font-weight:bold; font-size:12px;");
+        row->addWidget(lbl);
+        row->addStretch();
+        row->addWidget(val);
+        layout->addLayout(row);
+    };
+
+    // Beacon status — big label at top
+    QLabel *beaconHeader = new QLabel("BEACON STATUS", ui->recoveryGroupBox);
+    beaconHeader->setStyleSheet(
+        "color:#8b949e; font-size:9px; font-weight:bold; letter-spacing:1px;");
+    layout->addWidget(beaconHeader);
+
+    m_lblBeaconStatus = new QLabel("INACTIVE", ui->recoveryGroupBox);
+    m_lblBeaconStatus->setStyleSheet(
+        "color:#f85149; font-size:16px; font-weight:bold; font-family:'Consolas';");
+    m_lblBeaconStatus->setAlignment(Qt::AlignCenter);
+    layout->addWidget(m_lblBeaconStatus);
+
+    makeRow("Landing Lat:",   m_lblRecoveryLat);
+    makeRow("Landing Lon:",   m_lblRecoveryLon);
+    makeRow("Distance:",      m_lblRecoveryDistance);
+    makeRow("Direction:",     m_lblRecoveryBearing);
+    makeRow("Last Telemetry:", m_lblLastTelemetry);
+
+    // Start hidden — revealed on landing
+    ui->recoveryGroupBox->setVisible(false);
+    Q_UNUSED(cardStyle);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  Data Logging Panel — built into loggingGroupBox
+// ─────────────────────────────────────────────────────────────────────────────
+void MainWindow::setupLoggingPanel()
+{
+    QVBoxLayout *layout = ui->loggingPanelLayout;
+
+    // Recording dot
+    m_lblRecordingDot = new QLabel("◌ IDLE", ui->loggingGroupBox);
+    m_lblRecordingDot->setStyleSheet(
+        "color:#f85149; font-family:'Consolas'; font-weight:bold;"
+        " font-size:12px; letter-spacing:1px;");
+    layout->addWidget(m_lblRecordingDot);
+
+    auto makeRow = [&](const QString &label, QLabel *&val, const QString &init) {
+        QHBoxLayout *row = new QHBoxLayout();
+        QLabel *lbl = new QLabel(label, ui->loggingGroupBox);
+        lbl->setStyleSheet("color:#8b949e; font-size:10px;");
+        val = new QLabel(init, ui->loggingGroupBox);
+        val->setStyleSheet("color:#58a6ff; font-family:'Consolas'; font-size:11px; font-weight:bold;");
+        val->setWordWrap(true);
+        row->addWidget(lbl);
+        row->addStretch();
+        row->addWidget(val);
+        layout->addLayout(row);
+    };
+
+    makeRow("Log File:",          m_lblLogFile,           "mission_01.csv");
+    makeRow("Packets Stored:",    m_lblPacketsStored,     "0");
+    makeRow("Storage Remaining:", m_lblStorageRemaining,  "--");
+
+    // Export buttons
+    QPushButton *btnCsv = new QPushButton("⬇  Export CSV", ui->loggingGroupBox);
+    btnCsv->setStyleSheet(
+        "QPushButton { color:#58a6ff; background:rgba(88,166,255,0.08);"
+        " border:1px solid rgba(88,166,255,0.3); border-radius:4px;"
+        " padding:5px; font-size:10px; font-weight:bold; }"
+        "QPushButton:hover { background:rgba(88,166,255,0.15); }");
+    connect(btnCsv, &QPushButton::clicked, this, &MainWindow::onExportCsv);
+    layout->addWidget(btnCsv);
+
+    QPushButton *btnReport = new QPushButton("📄  Export Report", ui->loggingGroupBox);
+    btnReport->setStyleSheet(
+        "QPushButton { color:#3fb950; background:rgba(63,185,80,0.08);"
+        " border:1px solid rgba(63,185,80,0.3); border-radius:4px;"
+        " padding:5px; font-size:10px; font-weight:bold; }"
+        "QPushButton:hover { background:rgba(63,185,80,0.15); }");
+    connect(btnReport, &QPushButton::clicked, this, &MainWindow::onExportReport);
+    layout->addWidget(btnReport);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  Mission Timer Tick
+// ─────────────────────────────────────────────────────────────────────────────
+void MainWindow::onMissionTimerTick()
+{
+    m_missionSeconds++;
+    int h = m_missionSeconds / 3600;
+    int m = (m_missionSeconds % 3600) / 60;
+    int s = m_missionSeconds % 60;
+    if (m_lblMissionTimer)
+        m_lblMissionTimer->setText(QString("%1:%2:%3")
+            .arg(h, 2, 10, QChar('0'))
+            .arg(m, 2, 10, QChar('0'))
+            .arg(s, 2, 10, QChar('0')));
+}
+
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  Recovery Panel visibility toggle
+// ─────────────────────────────────────────────────────────────────────────────
+void MainWindow::showRecoveryPanel(bool visible)
+{
+    ui->recoveryGroupBox->setVisible(visible);
+    if (visible && m_lblBeaconStatus)
+        m_lblBeaconStatus->setText("ACTIVE");
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  Confirmation Dialog helper
+// ─────────────────────────────────────────────────────────────────────────────
+bool MainWindow::confirmAction(const QString &action)
+{
+    QMessageBox dlg(this);
+    dlg.setWindowTitle("Confirm Command");
+    dlg.setText(QString("<b>Are you sure you want to: %1?</b>").arg(action));
+    dlg.setInformativeText("This action will be sent to the CanSat immediately.");
+    dlg.setIcon(QMessageBox::Warning);
+    dlg.setStyleSheet(
+        "QMessageBox { background:#161b22; color:#c9d1d9; }"
+        "QLabel { color:#c9d1d9; }"
+        "QPushButton { background:#21262d; border:1px solid #30363d;"
+        " border-radius:4px; padding:6px 16px; color:#c9d1d9; font-weight:bold; }");
+    dlg.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
+    dlg.setDefaultButton(QMessageBox::Cancel);
+    return dlg.exec() == QMessageBox::Yes;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  Command Slots
+// ─────────────────────────────────────────────────────────────────────────────
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  Export Slots
+// ─────────────────────────────────────────────────────────────────────────────
+void MainWindow::onExportCsv()
+{
+    QString currentFile = m_logger->currentLogFile();
+    if (currentFile.isEmpty() || !QFile::exists(currentFile)) {
+        QMessageBox::warning(this, "Export Error", "No active or existing log file to export.");
+        return;
+    }
+
+    QDir dir("D:/NAKSHATRA/inspace_cansat_2026/gcs/app.gcs.system/datalogging");
+    if (!dir.exists()) {
+        dir.mkpath(".");
+    }
+
+    QString defaultName = QFileInfo(currentFile).fileName();
+    QString path = QFileDialog::getSaveFileName(
+        this, "Export CSV", dir.absoluteFilePath(defaultName), "CSV Files (*.csv)");
+
+    if (!path.isEmpty()) {
+        if (QFile::exists(path)) QFile::remove(path);
+        if (QFile::copy(currentFile, path)) {
+            QMessageBox::information(this, "Export", "CSV exported successfully to:\n" + path);
+        } else {
+            QMessageBox::warning(this, "Export Error", "Failed to copy CSV file.");
+        }
+    }
+}
+
+void MainWindow::onExportReport()
+{
+    QString path = QFileDialog::getSaveFileName(
+        this, "Export Mission Report",
+        QStandardPaths::writableLocation(QStandardPaths::DesktopLocation)
+              + "/mission_report.txt", "Text Files (*.txt)");
+    if (!path.isEmpty()) {
+        QFile f(path);
+        if (f.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            QTextStream out(&f);
+            out << "=== NAKSHATRA GCS Mission Report ===\n";
+            out << "Generated: " << QDateTime::currentDateTime().toString(Qt::ISODate) << "\n";
+            out << "Mission Duration: " << m_missionSeconds << " seconds\n";
+            out << "Packets Received: " << m_packetCount << "\n";
+            out << "Packets Stored:   " << m_packetStored << "\n";
+            f.close();
+        }
+        QMessageBox::information(this, "Export", "Report exported to:\n" + path);
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  State Panel — horizontal states
+// ─────────────────────────────────────────────────────────────────────────────
+void MainWindow::setupStatePanel()
+{
+    QVBoxLayout *layout = ui->statePanelLayout;
+    if (!layout) return;
+
+    auto createSeqLabel = [](const QString &text, QWidget *parent) {
+        QLabel *lbl = new QLabel(text, parent);
+        lbl->setAlignment(Qt::AlignCenter);
+        lbl->setStyleSheet("font-size: 11px; font-weight: bold; color: #484f58; padding: 2px;");
+        return lbl;
+    };
+
+    m_lblStateLaunch   = createSeqLabel("LAUNCH", ui->stateGroupBox);
+    m_lblStateDep1     = createSeqLabel("DEP 1", ui->stateGroupBox);
+    m_lblStateDescent  = createSeqLabel("DESCENT", ui->stateGroupBox);
+    m_lblStateDep2     = createSeqLabel("DEP 2", ui->stateGroupBox);
+    m_lblStateDescent2 = createSeqLabel("DESCENT", ui->stateGroupBox);
+    m_lblStateLand     = createSeqLabel("LAND", ui->stateGroupBox);
+
+    QHBoxLayout *hLayout = new QHBoxLayout();
+    hLayout->setSpacing(2);
+    hLayout->addWidget(m_lblStateLaunch);
+    
+    // Add arrows between states
+    auto addArrow = [&]() {
+        QLabel *arr = new QLabel("→", ui->stateGroupBox);
+        arr->setStyleSheet("color: #8b949e; font-size: 10px; font-weight: bold;");
+        arr->setAlignment(Qt::AlignCenter);
+        hLayout->addWidget(arr);
+    };
+
+    addArrow(); hLayout->addWidget(m_lblStateDep1);
+    addArrow(); hLayout->addWidget(m_lblStateDescent);
+    addArrow(); hLayout->addWidget(m_lblStateDep2);
+    addArrow(); hLayout->addWidget(m_lblStateDescent2);
+    addArrow(); hLayout->addWidget(m_lblStateLand);
+
+    layout->addLayout(hLayout);
 }

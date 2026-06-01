@@ -26,16 +26,20 @@ set(SOURCES
     src/main.cpp
     src/core/DataParser.cpp
     src/core/SerialWorker.cpp
+    src/core/Commands.cpp
     src/gui/MainWindow.cpp
+    src/gui/MapWidget.cpp
     src/storage/Logger.cpp
 )
 
 # Header files
 set(HEADERS
     src/common/TelemetryDef.h
+    src/core/CommandDef.h
     src/core/DataParser.h
     src/core/SerialWorker.h
     src/gui/MainWindow.h
+    src/gui/MapWidget.h
     src/storage/Logger.h
 )
 

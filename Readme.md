@@ -99,9 +99,12 @@ cmake -B build \
 **3. Build**
 cmake --build build --parallel
 
-**4. Run**
-./build/app.gcs.system          # Linux/macOS
-build\app.gcs.system.exe        # Windows
+**4. Deploy the required Qt library dependencies to the build folder by running the following command:**
+& "C:\Qt\6.11.1\mingw_64\bin\windeployqt.exe" .\build\Desktop_Qt_6_11_1_MinGW_64_bit-Debug\app.gcs.system.exe
+
+**5. Run**
+./build/Desktop_Qt_6_11_1_MinGW_64_bit-Debug/app.gcs.system          # Linux/macOS
+build\Desktop_Qt_6_11_1_MinGW_64_bit-Debug\app.gcs.system.exe        # Windows
 ```
 > **Qt Creator shortcut:** Open `CMakeLists.txt` directly in Qt Creator → select your kit → click the green Run button. The IDE handles CMake configuration automatically.**
 

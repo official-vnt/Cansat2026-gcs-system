@@ -3,264 +3,267 @@
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
   <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>1440</width>
-    <height>900</height>
-   </rect>
+   <rect><x>0</x><y>0</y><width>1440</width><height>900</height></rect>
   </property>
   <property name="windowTitle">
    <string>GCS Telemetry Dashboard</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
-    <!-- ─── TOP CONTROL BAR ─── -->
+    <property name="spacing"><number>3</number></property>
+
+    <!-- TOP RIBBON -->
     <item>
-     <layout class="QHBoxLayout" name="topBarLayout">
-      <property name="spacing">
-       <number>8</number>
-      </property>
-      <item>
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>COM Port:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="portComboBox"/>
-      </item>
-      <item>
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Baud Rate:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="baudComboBox"/>
-      </item>
-      <item>
-       <widget class="QPushButton" name="connectButton">
-        <property name="text">
-         <string>Connect</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="disconnectButton">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>Disconnect</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QLabel" name="statusLabel">
-        <property name="text">
-         <string>Disconnected</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
+     <widget class="QWidget" name="topRibbon">
+      <property name="minimumHeight"><number>46</number></property>
+      <property name="maximumHeight"><number>46</number></property>
+      <layout class="QHBoxLayout" name="topRibbonLayout">
+       <property name="spacing"><number>6</number></property>
+       <item>
+        <widget class="QLabel" name="lblTeamIdBadge">
+         <property name="text"><string>TEAM: #123456789</string></property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QFrame" name="sep1">
+         <property name="frameShape"><enum>QFrame::VLine</enum></property>
+         <property name="frameShadow"><enum>QFrame::Plain</enum></property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label"><property name="text"><string>Port:</string></property></widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="portComboBox">
+         <property name="maximumWidth"><number>90</number></property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_2"><property name="text"><string>Baud:</string></property></widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="baudComboBox">
+         <property name="maximumWidth"><number>90</number></property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="connectButton">
+         <property name="text"><string>CONNECT</string></property>
+         <property name="maximumWidth"><number>90</number></property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="disconnectButton">
+         <property name="enabled"><bool>false</bool></property>
+         <property name="text"><string>DISCONNECT</string></property>
+         <property name="maximumWidth"><number>100</number></property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QFrame" name="sep2">
+         <property name="frameShape"><enum>QFrame::VLine</enum></property>
+         <property name="frameShadow"><enum>QFrame::Plain</enum></property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="lblTimerCaption"><property name="text"><string>TIMER</string></property></widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="lblMissionTimer"><property name="text"><string>00:00:00</string></property></widget>
+       </item>
+       <item>
+        <widget class="QFrame" name="sep3">
+         <property name="frameShape"><enum>QFrame::VLine</enum></property>
+         <property name="frameShadow"><enum>QFrame::Plain</enum></property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="lblLinkCaption"><property name="text"><string>LINK</string></property></widget>
+       </item>
+       <item>
+        <widget class="QProgressBar" name="linkQualityBar">
+         <property name="minimumWidth"><number>60</number></property>
+         <property name="maximumWidth"><number>60</number></property>
+         <property name="maximumHeight"><number>10</number></property>
+         <property name="value"><number>0</number></property>
+         <property name="textVisible"><bool>false</bool></property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="lblRssiCaption"><property name="text"><string>RSSI:</string></property></widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="lblRssiVal"><property name="text"><string>-- dBm</string></property></widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="lblSnrCaption"><property name="text"><string>SNR:</string></property></widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="lblSnrVal"><property name="text"><string>-- dB</string></property></widget>
+       </item>
+       <item>
+        <widget class="QFrame" name="sep4">
+         <property name="frameShape"><enum>QFrame::VLine</enum></property>
+         <property name="frameShadow"><enum>QFrame::Plain</enum></property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="statusLabel"><property name="text"><string>○ Disconnected</string></property></widget>
+       </item>
+       <item>
+        <spacer name="ribbonSpacer">
+         <property name="orientation"><enum>Qt::Horizontal</enum></property>
+         <property name="sizeHint" stdset="0"><size><width>5</width><height>20</height></size></property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
     </item>
-    <!-- ─── MAIN 3-COLUMN LAYOUT (Left 30% | Charts 40% | Telemetry 30%) ─── -->
+
+    <!-- MAIN 3-COLUMN LAYOUT -->
     <item>
      <layout class="QHBoxLayout" name="mainContentLayout" stretch="3,4,3">
-      <property name="spacing">
-       <number>4</number>
-      </property>
-      <!-- ═══ LEFT PANEL (30%) — Mission Status, 3D Orientation, GPS ═══ -->
+      <property name="spacing"><number>4</number></property>
+
+      <!-- LEFT PANEL (30%) -->
       <item>
-       <widget class="QGroupBox" name="leftGroupBox">
-        <property name="title">
-         <string>Mission Overview</string>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>260</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>500</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <layout class="QVBoxLayout" name="leftPanelLayout">
-         <property name="spacing">
-          <number>8</number>
-         </property>
+       <widget class="QWidget" name="leftContainer">
+        <layout class="QVBoxLayout" name="leftOuterLayout">
+         <property name="spacing"><number>3</number></property>
+         <!-- Mission Overview -->
+         <item>
+          <widget class="QGroupBox" name="leftGroupBox">
+           <property name="title"><string>Mission Overview</string></property>
+           <layout class="QVBoxLayout" name="leftPanelLayout">
+            <property name="spacing"><number>4</number></property>
+           </layout>
+          </widget>
+         </item>
+         <!-- Bottom horizontal layout for Logging & State -->
+         <item>
+          <layout class="QHBoxLayout" name="bottomLeftLayout">
+           <!-- Data Logging (50%) -->
+           <item>
+            <widget class="QGroupBox" name="loggingGroupBox">
+             <property name="title"><string>Data Logging</string></property>
+             <property name="maximumHeight"><number>175</number></property>
+             <layout class="QVBoxLayout" name="loggingPanelLayout">
+              <property name="spacing"><number>3</number></property>
+             </layout>
+            </widget>
+           </item>
+           <!-- Cansat State (50%) -->
+           <item>
+            <widget class="QGroupBox" name="stateGroupBox">
+             <property name="title"><string>Cansat State</string></property>
+             <property name="maximumHeight"><number>175</number></property>
+             <layout class="QVBoxLayout" name="statePanelLayout">
+              <property name="spacing"><number>3</number></property>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </item>
         </layout>
        </widget>
       </item>
-      <!-- ═══ MIDDLE (40%) — 5 Equal-Height Stacked Charts ═══ -->
+
+      <!-- MIDDLE (40%) — Charts -->
       <item>
        <widget class="QWidget" name="chartsContainer">
         <layout class="QVBoxLayout" name="chartsVBoxLayout" stretch="1,1,1,1">
-         <property name="spacing">
-          <number>4</number>
-         </property>
-         <item>
-          <widget class="QChartView" name="altVoltTimeChartView"/>
-         </item>
-         <item>
-          <widget class="QChartView" name="altTempPresChartView"/>
-         </item>
-         <item>
-          <widget class="QChartView" name="altAccelChartView"/>
-         </item>
-         <item>
-          <widget class="QChartView" name="altGyroChartView"/>
-         </item>
+         <property name="spacing"><number>4</number></property>
+         <item><widget class="QChartView" name="altVoltTimeChartView"/></item>
+         <item><widget class="QChartView" name="altTempPresChartView"/></item>
+         <item><widget class="QChartView" name="altAccelChartView"/></item>
+         <item><widget class="QChartView" name="altGyroChartView"/></item>
         </layout>
        </widget>
       </item>
-      <!-- ═══ RIGHT PANEL (30%) — Telemetry Data ═══ -->
+
+      <!-- RIGHT PANEL (30%) -->
       <item>
        <widget class="QWidget" name="rightContainer">
-        <layout class="QVBoxLayout" name="rightPanelLayout">
-         <property name="spacing">
-          <number>0</number>
-         </property>
+        <layout class="QVBoxLayout" name="rightOuterLayout">
+         <property name="spacing"><number>3</number></property>
+         <!-- Telemetry Data -->
          <item>
           <widget class="QGroupBox" name="groupBox">
-           <property name="title">
-            <string>Telemetry Data</string>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>260</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>500</width>
-             <height>16777215</height>
-            </size>
-           </property>
+           <property name="title"><string>Telemetry Data</string></property>
            <layout class="QGridLayout" name="gridLayout">
             <item row="0" column="0">
-             <widget class="QLabel" name="label_team">
-              <property name="text"><string>Team ID:</string></property>
-             </widget>
+             <widget class="QLabel" name="label_team"><property name="text"><string>Team ID:</string></property></widget>
             </item>
             <item row="0" column="1">
-             <widget class="QLabel" name="lblTeamId">
-              <property name="text"><string>-</string></property>
-             </widget>
+             <widget class="QLabel" name="lblTeamId"><property name="text"><string>-</string></property></widget>
             </item>
             <item row="1" column="0">
-             <widget class="QLabel" name="label_3">
-              <property name="text"><string>Packet Count:</string></property>
-             </widget>
+             <widget class="QLabel" name="label_3"><property name="text"><string>Packet Count:</string></property></widget>
             </item>
             <item row="1" column="1">
-             <widget class="QLabel" name="lblPacketId">
-              <property name="text"><string>0</string></property>
-             </widget>
+             <widget class="QLabel" name="lblPacketId"><property name="text"><string>0</string></property></widget>
             </item>
             <item row="2" column="0">
-             <widget class="QLabel" name="label_4">
-              <property name="text"><string>Timestamp:</string></property>
-             </widget>
+             <widget class="QLabel" name="label_4"><property name="text"><string>Timestamp:</string></property></widget>
             </item>
             <item row="2" column="1">
-             <widget class="QLabel" name="lblTimestamp">
-              <property name="text"><string>0</string></property>
-             </widget>
+             <widget class="QLabel" name="lblTimestamp"><property name="text"><string>0</string></property></widget>
             </item>
             <item row="3" column="0">
-             <widget class="QLabel" name="label_5">
-              <property name="text"><string>Voltage:</string></property>
-             </widget>
+             <widget class="QLabel" name="label_5"><property name="text"><string>Voltage:</string></property></widget>
             </item>
             <item row="3" column="1">
-             <widget class="QLabel" name="lblVoltage">
-              <property name="text"><string>0 V</string></property>
-             </widget>
+             <widget class="QLabel" name="lblVoltage"><property name="text"><string>0 V</string></property></widget>
             </item>
             <item row="4" column="0">
-             <widget class="QLabel" name="label_6">
-              <property name="text"><string>GPS (Lat, Lon):</string></property>
-             </widget>
+             <widget class="QLabel" name="label_6"><property name="text"><string>GPS (Lat, Lon):</string></property></widget>
             </item>
             <item row="4" column="1">
-             <widget class="QLabel" name="lblGps">
-              <property name="text"><string>0, 0</string></property>
-             </widget>
+             <widget class="QLabel" name="lblGps"><property name="text"><string>0, 0</string></property></widget>
             </item>
             <item row="5" column="0">
-             <widget class="QLabel" name="label_7">
-              <property name="text"><string>Satellites:</string></property>
-             </widget>
+             <widget class="QLabel" name="label_7"><property name="text"><string>Satellites:</string></property></widget>
             </item>
             <item row="5" column="1">
-             <widget class="QLabel" name="lblSats">
-              <property name="text"><string>0</string></property>
-             </widget>
+             <widget class="QLabel" name="lblSats"><property name="text"><string>0</string></property></widget>
             </item>
             <item row="6" column="0">
-             <widget class="QLabel" name="label_8">
-              <property name="text"><string>State:</string></property>
-             </widget>
+             <widget class="QLabel" name="label_8"><property name="text"><string>State:</string></property></widget>
             </item>
             <item row="6" column="1">
-             <widget class="QLabel" name="lblState">
-              <property name="text"><string>-</string></property>
-             </widget>
+             <widget class="QLabel" name="lblState"><property name="text"><string>-</string></property></widget>
             </item>
            </layout>
           </widget>
          </item>
-         <!-- Spacer pushes groupBox to top so it doesn't stretch full height -->
+         <!-- Command Center -->
          <item>
-          <spacer name="rightVerticalSpacer">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>20</width>
-             <height>40</height>
-            </size>
-           </property>
-          </spacer>
+          <widget class="QGroupBox" name="commandGroupBox">
+           <property name="title"><string>Command Center</string></property>
+           <layout class="QGridLayout" name="commandPanelLayout">
+            <property name="spacing"><number>3</number></property>
+           </layout>
+          </widget>
+         </item>
+         <!-- Recovery Panel -->
+         <item>
+          <widget class="QGroupBox" name="recoveryGroupBox">
+           <property name="title"><string>Recovery Panel</string></property>
+           <layout class="QVBoxLayout" name="recoveryPanelLayout">
+            <property name="spacing"><number>3</number></property>
+           </layout>
+          </widget>
          </item>
         </layout>
        </widget>
       </item>
+
      </layout>
     </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>1440</width>
-     <height>22</height>
-    </rect>
-   </property>
+   <property name="geometry"><rect><x>0</x><y>0</y><width>1440</width><height>22</height></rect></property>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>

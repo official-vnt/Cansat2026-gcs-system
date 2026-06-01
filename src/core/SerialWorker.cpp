@@ -36,6 +36,13 @@ void SerialWorker::closePort()
     }
 }
 
+void SerialWorker::sendData(const QByteArray &data)
+{
+    if (m_serial->isOpen()) {
+        m_serial->write(data);
+    }
+}
+
 void SerialWorker::handleReadyRead()
 {
     QByteArray data = m_serial->readAll();

@@ -1289,6 +1289,12 @@
 			null
 		],
 		[
+			"D:/NAKSHATRA/inspace_cansat_2026/gcs/app.gcs.system/src/core/CommandDef.h",
+			"MU",
+			"PRMOGMWJPH/moc_CommandDef.cpp",
+			null
+		],
+		[
 			"D:/NAKSHATRA/inspace_cansat_2026/gcs/app.gcs.system/src/core/DataParser.h",
 			"MU",
 			"PRMOGMWJPH/moc_DataParser.cpp",
@@ -1304,6 +1310,12 @@
 			"D:/NAKSHATRA/inspace_cansat_2026/gcs/app.gcs.system/src/gui/MainWindow.h",
 			"MU",
 			"MXUWEOXILK/moc_MainWindow.cpp",
+			null
+		],
+		[
+			"D:/NAKSHATRA/inspace_cansat_2026/gcs/app.gcs.system/src/gui/MapWidget.h",
+			"MU",
+			"MXUWEOXILK/moc_MapWidget.cpp",
 			null
 		],
 		[
@@ -1420,6 +1432,11 @@
 	"SOURCES" : 
 	[
 		[
+			"D:/NAKSHATRA/inspace_cansat_2026/gcs/app.gcs.system/src/core/Commands.cpp",
+			"MU",
+			null
+		],
+		[
 			"D:/NAKSHATRA/inspace_cansat_2026/gcs/app.gcs.system/src/core/DataParser.cpp",
 			"MU",
 			null
@@ -1431,6 +1448,11 @@
 		],
 		[
 			"D:/NAKSHATRA/inspace_cansat_2026/gcs/app.gcs.system/src/gui/MainWindow.cpp",
+			"MU",
+			null
+		],
+		[
+			"D:/NAKSHATRA/inspace_cansat_2026/gcs/app.gcs.system/src/gui/MapWidget.cpp",
 			"MU",
 			null
 		],

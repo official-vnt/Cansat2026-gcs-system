@@ -2,4 +2,5 @@
 #include "PRMOGMWJPH/moc_DataParser.cpp"
 #include "PRMOGMWJPH/moc_SerialWorker.cpp"
 #include "MXUWEOXILK/moc_MainWindow.cpp"
+#include "MXUWEOXILK/moc_MapWidget.cpp"
 #include "F2ESZRYZMC/moc_Logger.cpp"

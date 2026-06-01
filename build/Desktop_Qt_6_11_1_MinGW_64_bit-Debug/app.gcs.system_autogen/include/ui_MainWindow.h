@@ -13,12 +13,14 @@
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QComboBox>
+#include <QtWidgets/QFrame>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
+#include <QtWidgets/QProgressBar>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QStatusBar>
@@ -32,18 +34,39 @@ class Ui_MainWindow
 public:
     QWidget *centralwidget;
     QVBoxLayout *verticalLayout;
-    QHBoxLayout *topBarLayout;
+    QWidget *topRibbon;
+    QHBoxLayout *topRibbonLayout;
+    QLabel *lblTeamIdBadge;
+    QFrame *sep1;
     QLabel *label;
     QComboBox *portComboBox;
     QLabel *label_2;
     QComboBox *baudComboBox;
     QPushButton *connectButton;
     QPushButton *disconnectButton;
-    QSpacerItem *horizontalSpacer;
+    QFrame *sep2;
+    QLabel *lblTimerCaption;
+    QLabel *lblMissionTimer;
+    QFrame *sep3;
+    QLabel *lblLinkCaption;
+    QProgressBar *linkQualityBar;
+    QLabel *lblRssiCaption;
+    QLabel *lblRssiVal;
+    QLabel *lblSnrCaption;
+    QLabel *lblSnrVal;
+    QFrame *sep4;
     QLabel *statusLabel;
+    QSpacerItem *ribbonSpacer;
     QHBoxLayout *mainContentLayout;
+    QWidget *leftContainer;
+    QVBoxLayout *leftOuterLayout;
     QGroupBox *leftGroupBox;
     QVBoxLayout *leftPanelLayout;
+    QHBoxLayout *bottomLeftLayout;
+    QGroupBox *loggingGroupBox;
+    QVBoxLayout *loggingPanelLayout;
+    QGroupBox *stateGroupBox;
+    QVBoxLayout *statePanelLayout;
     QWidget *chartsContainer;
     QVBoxLayout *chartsVBoxLayout;
     QChartView *altVoltTimeChartView;
@@ -51,7 +74,7 @@ public:
     QChartView *altAccelChartView;
     QChartView *altGyroChartView;
     QWidget *rightContainer;
-    QVBoxLayout *rightPanelLayout;
+    QVBoxLayout *rightOuterLayout;
     QGroupBox *groupBox;
     QGridLayout *gridLayout;
     QLabel *label_team;
@@ -68,7 +91,10 @@ public:
     QLabel *lblSats;
     QLabel *label_8;
     QLabel *lblState;
-    QSpacerItem *rightVerticalSpacer;
+    QGroupBox *commandGroupBox;
+    QGridLayout *commandPanelLayout;
+    QGroupBox *recoveryGroupBox;
+    QVBoxLayout *recoveryPanelLayout;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -80,65 +106,183 @@ public:
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName("centralwidget");
         verticalLayout = new QVBoxLayout(centralwidget);
+        verticalLayout->setSpacing(3);
         verticalLayout->setObjectName("verticalLayout");
-        topBarLayout = new QHBoxLayout();
-        topBarLayout->setSpacing(8);
-        topBarLayout->setObjectName("topBarLayout");
-        label = new QLabel(centralwidget);
+        topRibbon = new QWidget(centralwidget);
+        topRibbon->setObjectName("topRibbon");
+        topRibbon->setMinimumHeight(46);
+        topRibbon->setMaximumHeight(46);
+        topRibbonLayout = new QHBoxLayout(topRibbon);
+        topRibbonLayout->setSpacing(6);
+        topRibbonLayout->setObjectName("topRibbonLayout");
+        topRibbonLayout->setContentsMargins(0, 0, 0, 0);
+        lblTeamIdBadge = new QLabel(topRibbon);
+        lblTeamIdBadge->setObjectName("lblTeamIdBadge");
+
+        topRibbonLayout->addWidget(lblTeamIdBadge);
+
+        sep1 = new QFrame(topRibbon);
+        sep1->setObjectName("sep1");
+        sep1->setFrameShape(QFrame::VLine);
+        sep1->setFrameShadow(QFrame::Plain);
+
+        topRibbonLayout->addWidget(sep1);
+
+        label = new QLabel(topRibbon);
         label->setObjectName("label");
 
-        topBarLayout->addWidget(label);
+        topRibbonLayout->addWidget(label);
 
-        portComboBox = new QComboBox(centralwidget);
+        portComboBox = new QComboBox(topRibbon);
         portComboBox->setObjectName("portComboBox");
+        portComboBox->setMaximumWidth(90);
 
-        topBarLayout->addWidget(portComboBox);
+        topRibbonLayout->addWidget(portComboBox);
 
-        label_2 = new QLabel(centralwidget);
+        label_2 = new QLabel(topRibbon);
         label_2->setObjectName("label_2");
 
-        topBarLayout->addWidget(label_2);
+        topRibbonLayout->addWidget(label_2);
 
-        baudComboBox = new QComboBox(centralwidget);
+        baudComboBox = new QComboBox(topRibbon);
         baudComboBox->setObjectName("baudComboBox");
+        baudComboBox->setMaximumWidth(90);
 
-        topBarLayout->addWidget(baudComboBox);
+        topRibbonLayout->addWidget(baudComboBox);
 
-        connectButton = new QPushButton(centralwidget);
+        connectButton = new QPushButton(topRibbon);
         connectButton->setObjectName("connectButton");
+        connectButton->setMaximumWidth(90);
 
-        topBarLayout->addWidget(connectButton);
+        topRibbonLayout->addWidget(connectButton);
 
-        disconnectButton = new QPushButton(centralwidget);
+        disconnectButton = new QPushButton(topRibbon);
         disconnectButton->setObjectName("disconnectButton");
         disconnectButton->setEnabled(false);
+        disconnectButton->setMaximumWidth(100);
 
-        topBarLayout->addWidget(disconnectButton);
+        topRibbonLayout->addWidget(disconnectButton);
 
-        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+        sep2 = new QFrame(topRibbon);
+        sep2->setObjectName("sep2");
+        sep2->setFrameShape(QFrame::VLine);
+        sep2->setFrameShadow(QFrame::Plain);
 
-        topBarLayout->addItem(horizontalSpacer);
+        topRibbonLayout->addWidget(sep2);
 
-        statusLabel = new QLabel(centralwidget);
+        lblTimerCaption = new QLabel(topRibbon);
+        lblTimerCaption->setObjectName("lblTimerCaption");
+
+        topRibbonLayout->addWidget(lblTimerCaption);
+
+        lblMissionTimer = new QLabel(topRibbon);
+        lblMissionTimer->setObjectName("lblMissionTimer");
+
+        topRibbonLayout->addWidget(lblMissionTimer);
+
+        sep3 = new QFrame(topRibbon);
+        sep3->setObjectName("sep3");
+        sep3->setFrameShape(QFrame::VLine);
+        sep3->setFrameShadow(QFrame::Plain);
+
+        topRibbonLayout->addWidget(sep3);
+
+        lblLinkCaption = new QLabel(topRibbon);
+        lblLinkCaption->setObjectName("lblLinkCaption");
+
+        topRibbonLayout->addWidget(lblLinkCaption);
+
+        linkQualityBar = new QProgressBar(topRibbon);
+        linkQualityBar->setObjectName("linkQualityBar");
+        linkQualityBar->setMinimumWidth(60);
+        linkQualityBar->setMaximumWidth(60);
+        linkQualityBar->setMaximumHeight(10);
+        linkQualityBar->setValue(0);
+        linkQualityBar->setTextVisible(false);
+
+        topRibbonLayout->addWidget(linkQualityBar);
+
+        lblRssiCaption = new QLabel(topRibbon);
+        lblRssiCaption->setObjectName("lblRssiCaption");
+
+        topRibbonLayout->addWidget(lblRssiCaption);
+
+        lblRssiVal = new QLabel(topRibbon);
+        lblRssiVal->setObjectName("lblRssiVal");
+
+        topRibbonLayout->addWidget(lblRssiVal);
+
+        lblSnrCaption = new QLabel(topRibbon);
+        lblSnrCaption->setObjectName("lblSnrCaption");
+
+        topRibbonLayout->addWidget(lblSnrCaption);
+
+        lblSnrVal = new QLabel(topRibbon);
+        lblSnrVal->setObjectName("lblSnrVal");
+
+        topRibbonLayout->addWidget(lblSnrVal);
+
+        sep4 = new QFrame(topRibbon);
+        sep4->setObjectName("sep4");
+        sep4->setFrameShape(QFrame::VLine);
+        sep4->setFrameShadow(QFrame::Plain);
+
+        topRibbonLayout->addWidget(sep4);
+
+        statusLabel = new QLabel(topRibbon);
         statusLabel->setObjectName("statusLabel");
 
-        topBarLayout->addWidget(statusLabel);
+        topRibbonLayout->addWidget(statusLabel);
+
+        ribbonSpacer = new QSpacerItem(5, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+
+        topRibbonLayout->addItem(ribbonSpacer);
 
 
-        verticalLayout->addLayout(topBarLayout);
+        verticalLayout->addWidget(topRibbon);
 
         mainContentLayout = new QHBoxLayout();
         mainContentLayout->setSpacing(4);
         mainContentLayout->setObjectName("mainContentLayout");
-        leftGroupBox = new QGroupBox(centralwidget);
+        leftContainer = new QWidget(centralwidget);
+        leftContainer->setObjectName("leftContainer");
+        leftOuterLayout = new QVBoxLayout(leftContainer);
+        leftOuterLayout->setSpacing(3);
+        leftOuterLayout->setObjectName("leftOuterLayout");
+        leftOuterLayout->setContentsMargins(0, 0, 0, 0);
+        leftGroupBox = new QGroupBox(leftContainer);
         leftGroupBox->setObjectName("leftGroupBox");
-        leftGroupBox->setMinimumSize(QSize(260, 0));
-        leftGroupBox->setMaximumSize(QSize(500, 16777215));
         leftPanelLayout = new QVBoxLayout(leftGroupBox);
-        leftPanelLayout->setSpacing(8);
+        leftPanelLayout->setSpacing(4);
         leftPanelLayout->setObjectName("leftPanelLayout");
 
-        mainContentLayout->addWidget(leftGroupBox);
+        leftOuterLayout->addWidget(leftGroupBox);
+
+        bottomLeftLayout = new QHBoxLayout();
+        bottomLeftLayout->setObjectName("bottomLeftLayout");
+        loggingGroupBox = new QGroupBox(leftContainer);
+        loggingGroupBox->setObjectName("loggingGroupBox");
+        loggingGroupBox->setMaximumHeight(175);
+        loggingPanelLayout = new QVBoxLayout(loggingGroupBox);
+        loggingPanelLayout->setSpacing(3);
+        loggingPanelLayout->setObjectName("loggingPanelLayout");
+
+        bottomLeftLayout->addWidget(loggingGroupBox);
+
+        stateGroupBox = new QGroupBox(leftContainer);
+        stateGroupBox->setObjectName("stateGroupBox");
+        stateGroupBox->setMaximumHeight(175);
+        statePanelLayout = new QVBoxLayout(stateGroupBox);
+        statePanelLayout->setSpacing(3);
+        statePanelLayout->setObjectName("statePanelLayout");
+
+        bottomLeftLayout->addWidget(stateGroupBox);
+
+
+        leftOuterLayout->addLayout(bottomLeftLayout);
+
+
+        mainContentLayout->addWidget(leftContainer);
 
         chartsContainer = new QWidget(centralwidget);
         chartsContainer->setObjectName("chartsContainer");
@@ -175,14 +319,12 @@ public:
 
         rightContainer = new QWidget(centralwidget);
         rightContainer->setObjectName("rightContainer");
-        rightPanelLayout = new QVBoxLayout(rightContainer);
-        rightPanelLayout->setSpacing(0);
-        rightPanelLayout->setObjectName("rightPanelLayout");
-        rightPanelLayout->setContentsMargins(0, 0, 0, 0);
+        rightOuterLayout = new QVBoxLayout(rightContainer);
+        rightOuterLayout->setSpacing(3);
+        rightOuterLayout->setObjectName("rightOuterLayout");
+        rightOuterLayout->setContentsMargins(0, 0, 0, 0);
         groupBox = new QGroupBox(rightContainer);
         groupBox->setObjectName("groupBox");
-        groupBox->setMinimumSize(QSize(260, 0));
-        groupBox->setMaximumSize(QSize(500, 16777215));
         gridLayout = new QGridLayout(groupBox);
         gridLayout->setObjectName("gridLayout");
         label_team = new QLabel(groupBox);
@@ -256,11 +398,23 @@ public:
         gridLayout->addWidget(lblState, 6, 1, 1, 1);
 
 
-        rightPanelLayout->addWidget(groupBox);
+        rightOuterLayout->addWidget(groupBox);
 
-        rightVerticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
+        commandGroupBox = new QGroupBox(rightContainer);
+        commandGroupBox->setObjectName("commandGroupBox");
+        commandPanelLayout = new QGridLayout(commandGroupBox);
+        commandPanelLayout->setSpacing(3);
+        commandPanelLayout->setObjectName("commandPanelLayout");
 
-        rightPanelLayout->addItem(rightVerticalSpacer);
+        rightOuterLayout->addWidget(commandGroupBox);
+
+        recoveryGroupBox = new QGroupBox(rightContainer);
+        recoveryGroupBox->setObjectName("recoveryGroupBox");
+        recoveryPanelLayout = new QVBoxLayout(recoveryGroupBox);
+        recoveryPanelLayout->setSpacing(3);
+        recoveryPanelLayout->setObjectName("recoveryPanelLayout");
+
+        rightOuterLayout->addWidget(recoveryGroupBox);
 
 
         mainContentLayout->addWidget(rightContainer);
@@ -288,12 +442,22 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "GCS Telemetry Dashboard", nullptr));
-        label->setText(QCoreApplication::translate("MainWindow", "COM Port:", nullptr));
-        label_2->setText(QCoreApplication::translate("MainWindow", "Baud Rate:", nullptr));
-        connectButton->setText(QCoreApplication::translate("MainWindow", "Connect", nullptr));
-        disconnectButton->setText(QCoreApplication::translate("MainWindow", "Disconnect", nullptr));
-        statusLabel->setText(QCoreApplication::translate("MainWindow", "Disconnected", nullptr));
+        lblTeamIdBadge->setText(QCoreApplication::translate("MainWindow", "TEAM: #123456789", nullptr));
+        label->setText(QCoreApplication::translate("MainWindow", "Port:", nullptr));
+        label_2->setText(QCoreApplication::translate("MainWindow", "Baud:", nullptr));
+        connectButton->setText(QCoreApplication::translate("MainWindow", "CONNECT", nullptr));
+        disconnectButton->setText(QCoreApplication::translate("MainWindow", "DISCONNECT", nullptr));
+        lblTimerCaption->setText(QCoreApplication::translate("MainWindow", "TIMER", nullptr));
+        lblMissionTimer->setText(QCoreApplication::translate("MainWindow", "00:00:00", nullptr));
+        lblLinkCaption->setText(QCoreApplication::translate("MainWindow", "LINK", nullptr));
+        lblRssiCaption->setText(QCoreApplication::translate("MainWindow", "RSSI:", nullptr));
+        lblRssiVal->setText(QCoreApplication::translate("MainWindow", "-- dBm", nullptr));
+        lblSnrCaption->setText(QCoreApplication::translate("MainWindow", "SNR:", nullptr));
+        lblSnrVal->setText(QCoreApplication::translate("MainWindow", "-- dB", nullptr));
+        statusLabel->setText(QCoreApplication::translate("MainWindow", "\342\227\213 Disconnected", nullptr));
         leftGroupBox->setTitle(QCoreApplication::translate("MainWindow", "Mission Overview", nullptr));
+        loggingGroupBox->setTitle(QCoreApplication::translate("MainWindow", "Data Logging", nullptr));
+        stateGroupBox->setTitle(QCoreApplication::translate("MainWindow", "Cansat State", nullptr));
         groupBox->setTitle(QCoreApplication::translate("MainWindow", "Telemetry Data", nullptr));
         label_team->setText(QCoreApplication::translate("MainWindow", "Team ID:", nullptr));
         lblTeamId->setText(QCoreApplication::translate("MainWindow", "-", nullptr));
@@ -309,6 +473,8 @@ public:
         lblSats->setText(QCoreApplication::translate("MainWindow", "0", nullptr));
         label_8->setText(QCoreApplication::translate("MainWindow", "State:", nullptr));
         lblState->setText(QCoreApplication::translate("MainWindow", "-", nullptr));
+        commandGroupBox->setTitle(QCoreApplication::translate("MainWindow", "Command Center", nullptr));
+        recoveryGroupBox->setTitle(QCoreApplication::translate("MainWindow", "Recovery Panel", nullptr));
     } // retranslateUi
 
 };

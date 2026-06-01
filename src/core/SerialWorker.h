@@ -14,6 +14,7 @@ public:
 public slots:
     void openPort(const QString &portName, int baudRate);
     void closePort();
+    void sendData(const QByteArray &data);
 
 signals:
     void dataReady(const QByteArray &data);

@@ -14,6 +14,7 @@ public:
 
     bool startLogging(const QString &dirPath);
     void stopLogging();
+    QString currentLogFile() const { return m_logFile.fileName(); }
 
 public slots:
     void logPacket(const TelemetryPacket &packet);

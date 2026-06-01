@@ -50,6 +50,7 @@ template <> constexpr inline auto SerialWorker::qt_create_metaobjectdata<qt_meta
         "portName",
         "baudRate",
         "closePort",
+        "sendData",
         "handleReadyRead",
         "handleError",
         "QSerialPort::SerialPortError"
@@ -74,11 +75,15 @@ template <> constexpr inline auto SerialWorker::qt_create_metaobjectdata<qt_meta
         }}),
         // Slot 'closePort'
         QtMocHelpers::SlotData<void()>(11, 2, QMC::AccessPublic, QMetaType::Void),
+        // Slot 'sendData'
+        QtMocHelpers::SlotData<void(const QByteArray &)>(12, 2, QMC::AccessPublic, QMetaType::Void, {{
+            { QMetaType::QByteArray, 3 },
+        }}),
         // Slot 'handleReadyRead'
-        QtMocHelpers::SlotData<void()>(12, 2, QMC::AccessPrivate, QMetaType::Void),
+        QtMocHelpers::SlotData<void()>(13, 2, QMC::AccessPrivate, QMetaType::Void),
         // Slot 'handleError'
-        QtMocHelpers::SlotData<void(QSerialPort::SerialPortError)>(13, 2, QMC::AccessPrivate, QMetaType::Void, {{
-            { 0x80000000 | 14, 5 },
+        QtMocHelpers::SlotData<void(QSerialPort::SerialPortError)>(14, 2, QMC::AccessPrivate, QMetaType::Void, {{
+            { 0x80000000 | 15, 5 },
         }}),
     };
     QtMocHelpers::UintData qt_properties {
@@ -109,8 +114,9 @@ void SerialWorker::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id
         case 3: _t->portClosed(); break;
         case 4: _t->openPort((*reinterpret_cast<std::add_pointer_t<QString>>(_a[1])),(*reinterpret_cast<std::add_pointer_t<int>>(_a[2]))); break;
         case 5: _t->closePort(); break;
-        case 6: _t->handleReadyRead(); break;
-        case 7: _t->handleError((*reinterpret_cast<std::add_pointer_t<QSerialPort::SerialPortError>>(_a[1]))); break;
+        case 6: _t->sendData((*reinterpret_cast<std::add_pointer_t<QByteArray>>(_a[1]))); break;
+        case 7: _t->handleReadyRead(); break;
+        case 8: _t->handleError((*reinterpret_cast<std::add_pointer_t<QSerialPort::SerialPortError>>(_a[1]))); break;
         default: ;
         }
     }
@@ -145,14 +151,14 @@ int SerialWorker::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 8)
+        if (_id < 9)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 8;
+        _id -= 9;
     }
     if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 8)
+        if (_id < 9)
             *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 8;
+        _id -= 9;
     }
     return _id;
 }
