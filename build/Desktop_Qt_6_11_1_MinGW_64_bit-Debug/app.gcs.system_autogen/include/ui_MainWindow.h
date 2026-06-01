@@ -32,7 +32,7 @@ class Ui_MainWindow
 public:
     QWidget *centralwidget;
     QVBoxLayout *verticalLayout;
-    QHBoxLayout *horizontalLayout;
+    QHBoxLayout *topBarLayout;
     QLabel *label;
     QComboBox *portComboBox;
     QLabel *label_2;
@@ -41,7 +41,17 @@ public:
     QPushButton *disconnectButton;
     QSpacerItem *horizontalSpacer;
     QLabel *statusLabel;
-    QHBoxLayout *horizontalLayout_2;
+    QHBoxLayout *mainContentLayout;
+    QGroupBox *leftGroupBox;
+    QVBoxLayout *leftPanelLayout;
+    QWidget *chartsContainer;
+    QVBoxLayout *chartsVBoxLayout;
+    QChartView *altVoltTimeChartView;
+    QChartView *altTempPresChartView;
+    QChartView *altAccelChartView;
+    QChartView *altGyroChartView;
+    QWidget *rightContainer;
+    QVBoxLayout *rightPanelLayout;
     QGroupBox *groupBox;
     QGridLayout *gridLayout;
     QLabel *label_team;
@@ -58,9 +68,7 @@ public:
     QLabel *lblSats;
     QLabel *label_8;
     QLabel *lblState;
-    QVBoxLayout *verticalLayout_2;
-    QChartView *altChartView;
-    QChartView *tempChartView;
+    QSpacerItem *rightVerticalSpacer;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -68,60 +76,113 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName("MainWindow");
-        MainWindow->resize(1024, 768);
+        MainWindow->resize(1440, 900);
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName("centralwidget");
         verticalLayout = new QVBoxLayout(centralwidget);
         verticalLayout->setObjectName("verticalLayout");
-        horizontalLayout = new QHBoxLayout();
-        horizontalLayout->setObjectName("horizontalLayout");
+        topBarLayout = new QHBoxLayout();
+        topBarLayout->setSpacing(8);
+        topBarLayout->setObjectName("topBarLayout");
         label = new QLabel(centralwidget);
         label->setObjectName("label");
 
-        horizontalLayout->addWidget(label);
+        topBarLayout->addWidget(label);
 
         portComboBox = new QComboBox(centralwidget);
         portComboBox->setObjectName("portComboBox");
 
-        horizontalLayout->addWidget(portComboBox);
+        topBarLayout->addWidget(portComboBox);
 
         label_2 = new QLabel(centralwidget);
         label_2->setObjectName("label_2");
 
-        horizontalLayout->addWidget(label_2);
+        topBarLayout->addWidget(label_2);
 
         baudComboBox = new QComboBox(centralwidget);
         baudComboBox->setObjectName("baudComboBox");
 
-        horizontalLayout->addWidget(baudComboBox);
+        topBarLayout->addWidget(baudComboBox);
 
         connectButton = new QPushButton(centralwidget);
         connectButton->setObjectName("connectButton");
 
-        horizontalLayout->addWidget(connectButton);
+        topBarLayout->addWidget(connectButton);
 
         disconnectButton = new QPushButton(centralwidget);
         disconnectButton->setObjectName("disconnectButton");
         disconnectButton->setEnabled(false);
 
-        horizontalLayout->addWidget(disconnectButton);
+        topBarLayout->addWidget(disconnectButton);
 
         horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
 
-        horizontalLayout->addItem(horizontalSpacer);
+        topBarLayout->addItem(horizontalSpacer);
 
         statusLabel = new QLabel(centralwidget);
         statusLabel->setObjectName("statusLabel");
 
-        horizontalLayout->addWidget(statusLabel);
+        topBarLayout->addWidget(statusLabel);
 
 
-        verticalLayout->addLayout(horizontalLayout);
+        verticalLayout->addLayout(topBarLayout);
 
-        horizontalLayout_2 = new QHBoxLayout();
-        horizontalLayout_2->setObjectName("horizontalLayout_2");
-        groupBox = new QGroupBox(centralwidget);
+        mainContentLayout = new QHBoxLayout();
+        mainContentLayout->setSpacing(4);
+        mainContentLayout->setObjectName("mainContentLayout");
+        leftGroupBox = new QGroupBox(centralwidget);
+        leftGroupBox->setObjectName("leftGroupBox");
+        leftGroupBox->setMinimumSize(QSize(260, 0));
+        leftGroupBox->setMaximumSize(QSize(500, 16777215));
+        leftPanelLayout = new QVBoxLayout(leftGroupBox);
+        leftPanelLayout->setSpacing(8);
+        leftPanelLayout->setObjectName("leftPanelLayout");
+
+        mainContentLayout->addWidget(leftGroupBox);
+
+        chartsContainer = new QWidget(centralwidget);
+        chartsContainer->setObjectName("chartsContainer");
+        chartsVBoxLayout = new QVBoxLayout(chartsContainer);
+        chartsVBoxLayout->setSpacing(4);
+        chartsVBoxLayout->setObjectName("chartsVBoxLayout");
+        chartsVBoxLayout->setContentsMargins(0, 0, 0, 0);
+        altVoltTimeChartView = new QChartView(chartsContainer);
+        altVoltTimeChartView->setObjectName("altVoltTimeChartView");
+
+        chartsVBoxLayout->addWidget(altVoltTimeChartView);
+
+        altTempPresChartView = new QChartView(chartsContainer);
+        altTempPresChartView->setObjectName("altTempPresChartView");
+
+        chartsVBoxLayout->addWidget(altTempPresChartView);
+
+        altAccelChartView = new QChartView(chartsContainer);
+        altAccelChartView->setObjectName("altAccelChartView");
+
+        chartsVBoxLayout->addWidget(altAccelChartView);
+
+        altGyroChartView = new QChartView(chartsContainer);
+        altGyroChartView->setObjectName("altGyroChartView");
+
+        chartsVBoxLayout->addWidget(altGyroChartView);
+
+        chartsVBoxLayout->setStretch(0, 1);
+        chartsVBoxLayout->setStretch(1, 1);
+        chartsVBoxLayout->setStretch(2, 1);
+        chartsVBoxLayout->setStretch(3, 1);
+
+        mainContentLayout->addWidget(chartsContainer);
+
+        rightContainer = new QWidget(centralwidget);
+        rightContainer->setObjectName("rightContainer");
+        rightPanelLayout = new QVBoxLayout(rightContainer);
+        rightPanelLayout->setSpacing(0);
+        rightPanelLayout->setObjectName("rightPanelLayout");
+        rightPanelLayout->setContentsMargins(0, 0, 0, 0);
+        groupBox = new QGroupBox(rightContainer);
         groupBox->setObjectName("groupBox");
+        groupBox->setMinimumSize(QSize(260, 0));
+        groupBox->setMaximumSize(QSize(500, 16777215));
         gridLayout = new QGridLayout(groupBox);
         gridLayout->setObjectName("gridLayout");
         label_team = new QLabel(groupBox);
@@ -195,30 +256,25 @@ public:
         gridLayout->addWidget(lblState, 6, 1, 1, 1);
 
 
-        horizontalLayout_2->addWidget(groupBox);
+        rightPanelLayout->addWidget(groupBox);
 
-        verticalLayout_2 = new QVBoxLayout();
-        verticalLayout_2->setObjectName("verticalLayout_2");
-        altChartView = new QChartView(centralwidget);
-        altChartView->setObjectName("altChartView");
+        rightVerticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
 
-        verticalLayout_2->addWidget(altChartView);
-
-        tempChartView = new QChartView(centralwidget);
-        tempChartView->setObjectName("tempChartView");
-
-        verticalLayout_2->addWidget(tempChartView);
+        rightPanelLayout->addItem(rightVerticalSpacer);
 
 
-        horizontalLayout_2->addLayout(verticalLayout_2);
+        mainContentLayout->addWidget(rightContainer);
 
+        mainContentLayout->setStretch(0, 3);
+        mainContentLayout->setStretch(1, 4);
+        mainContentLayout->setStretch(2, 3);
 
-        verticalLayout->addLayout(horizontalLayout_2);
+        verticalLayout->addLayout(mainContentLayout);
 
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName("menubar");
-        menubar->setGeometry(QRect(0, 0, 1024, 22));
+        menubar->setGeometry(QRect(0, 0, 1440, 22));
         MainWindow->setMenuBar(menubar);
         statusbar = new QStatusBar(MainWindow);
         statusbar->setObjectName("statusbar");
@@ -237,6 +293,7 @@ public:
         connectButton->setText(QCoreApplication::translate("MainWindow", "Connect", nullptr));
         disconnectButton->setText(QCoreApplication::translate("MainWindow", "Disconnect", nullptr));
         statusLabel->setText(QCoreApplication::translate("MainWindow", "Disconnected", nullptr));
+        leftGroupBox->setTitle(QCoreApplication::translate("MainWindow", "Mission Overview", nullptr));
         groupBox->setTitle(QCoreApplication::translate("MainWindow", "Telemetry Data", nullptr));
         label_team->setText(QCoreApplication::translate("MainWindow", "Team ID:", nullptr));
         lblTeamId->setText(QCoreApplication::translate("MainWindow", "-", nullptr));

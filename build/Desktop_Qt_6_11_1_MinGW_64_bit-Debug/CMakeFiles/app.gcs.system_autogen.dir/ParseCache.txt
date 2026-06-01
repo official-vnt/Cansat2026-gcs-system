@@ -391,11 +391,13 @@ D:/NAKSHATRA/inspace_cansat_2026/gcs/app.gcs.system/src/gui/MainWindow.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCharts/qvalueaxis.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCharts/qxyseries.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/QByteArray
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/QEvent
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/QFile
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/QList
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/QMargins
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/QObject
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/QRect
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/QRectF
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/QSize
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/QSizeF
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/QString
@@ -428,6 +430,7 @@ D:/NAKSHATRA/inspace_cansat_2026/gcs/app.gcs.system/src/gui/MainWindow.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qbytearrayalgorithms.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qbytearraylist.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qbytearrayview.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qcalendar.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qchar.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qcheckedint_impl.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qcompare.h
@@ -445,6 +448,7 @@ D:/NAKSHATRA/inspace_cansat_2026/gcs/app.gcs.system/src/gui/MainWindow.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qcoreevent.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qdarwinhelpers.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qdatastream.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qdatetime.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qdeadlinetimer.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qdebug.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qendian.h
@@ -465,6 +469,7 @@ D:/NAKSHATRA/inspace_cansat_2026/gcs/app.gcs.system/src/gui/MainWindow.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qiodevice.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qiodevicebase.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qiterable.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qiterable_impl.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qiterator.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qlatin1stringview.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qline.h
@@ -476,6 +481,8 @@ D:/NAKSHATRA/inspace_cansat_2026/gcs/app.gcs.system/src/gui/MainWindow.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qmargins.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qmath.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qmetacontainer.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qmetaobject.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qmetasequence.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qmetatype.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qminmax.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qnamespace.h
@@ -488,6 +495,7 @@ D:/NAKSHATRA/inspace_cansat_2026/gcs/app.gcs.system/src/gui/MainWindow.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qoverload.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qpair.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qpoint.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qpointer.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qprocessordetection.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qproperty.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qpropertyprivate.h
@@ -538,17 +546,20 @@ D:/NAKSHATRA/inspace_cansat_2026/gcs/app.gcs.system/src/gui/MainWindow.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qtversion.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qtversionchecks.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qtypeinfo.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qtyperevision.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qtypes.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qurl.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qutf8stringview.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qvariant.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qvarlengtharray.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qversionnumber.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qversiontagging.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qxptype_traits.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/qyieldcpu.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtGui/QBrush
  mdp:C:/Qt/6.11.1/mingw_64/include/QtGui/QFont
  mdp:C:/Qt/6.11.1/mingw_64/include/QtGui/QImage
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtGui/QMatrix4x4
  mdp:C:/Qt/6.11.1/mingw_64/include/QtGui/QPen
  mdp:C:/Qt/6.11.1/mingw_64/include/QtGui/QTransform
  mdp:C:/Qt/6.11.1/mingw_64/include/QtGui/QVector3D
@@ -563,6 +574,7 @@ D:/NAKSHATRA/inspace_cansat_2026/gcs/app.gcs.system/src/gui/MainWindow.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtGui/qfontinfo.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtGui/qfontmetrics.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtGui/qfontvariableaxis.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtGui/qgenericmatrix.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtGui/qguiapplication.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtGui/qguiapplication_platform.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtGui/qicon.h
@@ -570,6 +582,7 @@ D:/NAKSHATRA/inspace_cansat_2026/gcs/app.gcs.system/src/gui/MainWindow.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtGui/qinputdevice.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtGui/qinputmethod.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtGui/qkeysequence.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtGui/qmatrix4x4.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtGui/qpaintdevice.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtGui/qpainter.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtGui/qpainterpath.h
@@ -585,6 +598,8 @@ D:/NAKSHATRA/inspace_cansat_2026/gcs/app.gcs.system/src/gui/MainWindow.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtGui/qrgba64.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtGui/qscreen.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtGui/qscreen_platform.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtGui/qsurface.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtGui/qsurfaceformat.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtGui/qtextdocument.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtGui/qtextoption.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtGui/qtgui-config.h
@@ -592,9 +607,42 @@ D:/NAKSHATRA/inspace_cansat_2026/gcs/app.gcs.system/src/gui/MainWindow.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtGui/qtguiglobal.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtGui/qtransform.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtGui/qvector2d.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtGui/qvector3d.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtGui/qvector4d.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtGui/qvectornd.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtGui/qwindow.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtGui/qwindowdefs.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtGui/qwindowdefs_win.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtNetwork/qtnetwork-config.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtNetwork/qtnetworkexports.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtNetwork/qtnetworkglobal.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtQml/qjsnumbercoercion.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtQml/qjsprimitivevalue.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtQml/qjsvalue.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtQml/qqml.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtQml/qqmldebug.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtQml/qqmlerror.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtQml/qqmlinfo.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtQml/qqmllist.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtQml/qqmlparserstatus.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtQml/qqmlprivate.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtQml/qqmlpropertyvaluesource.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtQml/qqmlregistration.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtQml/qtqml-config.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtQml/qtqmlexports.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtQml/qtqmlglobal.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtQmlIntegration/qqmlintegration.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtQuick/qquickwindow.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtQuick/qsggeometry.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtQuick/qsgnode.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtQuick/qsgrendererinterface.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtQuick/qtquick-config.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtQuick/qtquickexports.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtQuick/qtquickglobal.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtQuickWidgets/QQuickWidget
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtQuickWidgets/qquickwidget.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtQuickWidgets/qtquickwidgetsexports.h
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtQuickWidgets/qtquickwidgetsglobal.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtSerialPort/QSerialPort
  mdp:C:/Qt/6.11.1/mingw_64/include/QtSerialPort/qserialport.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtSerialPort/qserialportglobal.h
@@ -828,6 +876,7 @@ D:/NAKSHATRA/inspace_cansat_2026/gcs/app.gcs.system/src/gui/MainWindow.h
  mdp:C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/x86_64-w64-mingw32/bits/messages_members.h
  mdp:C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/x86_64-w64-mingw32/bits/os_defines.h
  mdp:C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/x86_64-w64-mingw32/bits/time_members.h
+ mdp:C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/float.h
  mdp:C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/limits.h
  mdp:C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/stdarg.h
  mdp:C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/stdbool.h

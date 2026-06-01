@@ -6,6 +6,7 @@
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QChartView>
 #include <QtCharts/QValueAxis>
+#include <QQuickWidget>
 
 #include <QLabel>
 #include "core/SerialWorker.h"
@@ -36,17 +37,19 @@ private:
     void setupUiGraphs();
     void setupConnections();
     void setupDashboardCards();
+    void setupLeftPanel();
     void updateCharts(const TelemetryPacket &packet);
+    void styleChart(QChart *chart, const QString &title);
 
     Ui::MainWindow *ui;
 
-    // Threads and Workers
+    // Threading & backend
     QThread m_serialThread;
     SerialWorker *m_worker;
     DataParser *m_parser;
     Logger *m_logger;
 
-    // Custom Telemetry Readout Labels
+    // ── RIGHT PANEL: Telemetry readout labels ────────────────────────────────
     QLabel *m_lblTeamId;
     QLabel *m_lblVoltage;
     QLabel *m_lblAltitudeVal;
@@ -64,17 +67,54 @@ private:
     QLabel *m_lblSatellites;
     QLabel *m_lblState;
 
-    // Charts
-    QChart *m_altChart;
-    QLineSeries *m_altSeries;
-    QValueAxis *m_altAxisX;
-    QValueAxis *m_altAxisY;
-
-    QChart *m_tempChart;
-    QLineSeries *m_tempSeries;
-    QValueAxis *m_tempAxisX;
-    QValueAxis *m_tempAxisY;
+    // ── LEFT PANEL: Mission overview, orientation, GPS ───────────────────────
+    // 1. 3D Orientation
+    QQuickWidget *m_orientation3DWidget;
+    QLabel *m_lblOrientRoll;       // Roll  computed from accel (°)
+    QLabel *m_lblOrientPitch;      // Pitch computed from accel (°)
+    QLabel *m_lblOrientYawRate;    // Yaw rate = Gyro Z (°/s)
     
+    // 2. GPS Location
+    QLabel *m_lblLeftGpsLat;
+    QLabel *m_lblLeftGpsLon;
+    QLabel *m_lblLeftGpsAlt;
+    QLabel *m_lblLeftGpsSats;
+    QLabel *m_lblMapPlaceholder; // Map visual element
+
+    // 3. Mission State
+    QLabel *m_lblLeftState;        // Large mission-state indicator
+
+    // ── Chart 1: Altitude & Voltage vs Time ─────────────────────────────────
+    QChart      *m_altVoltTimeChart;
+    QLineSeries *m_altTimeSeries;   // Cyan  (#58a6ff)
+    QLineSeries *m_voltTimeSeries;  // Gold  (#ffa657)
+    QValueAxis  *m_altVoltAxisX;    // Time (s)
+    QValueAxis  *m_altVoltAxisYAlt; // Altitude (m)  [Left-Y]
+    QValueAxis  *m_altVoltAxisYVolt;// Voltage (V)   [Right-Y]
+
+    // ── Chart 2: Altitude (X) vs Temp (left-Y) & Pressure (right-Y) ─────────
+    QChart      *m_altTempPresChart;
+    QLineSeries *m_altTempSeries;   // Green (#3fb950)
+    QLineSeries *m_altPresSeries;   // Amber (#e3b341)
+    QValueAxis  *m_atpAxisX;        // Altitude (m) – shared X
+    QValueAxis  *m_atpAxisYTemp;    // Temperature (°C) – left Y
+    QValueAxis  *m_atpAxisYPres;    // Pressure (Pa) – right Y
+
+    // ── Chart 3: Altitude (X) vs Accelerometer X/Y/Z ────────────────────────
+    QChart      *m_altAccelChart;
+    QLineSeries *m_altAccelX;       // Red    (#f85149)
+    QLineSeries *m_altAccelY;       // Lime   (#7ee787)
+    QLineSeries *m_altAccelZ;       // Purple (#d2a8ff)
+    QValueAxis  *m_accelAxisX;      // Altitude (m)
+    QValueAxis  *m_accelAxisY;      // Acceleration (g)
+
+    // ── Chart 4: Altitude (X) vs Gyroscope X/Y/Z ────────────────────────────
+    QChart      *m_altGyroChart;
+    QLineSeries *m_altGyroX;        // Amber (#e3b341)
+    QLineSeries *m_altGyroY;        // Sky   (#79c0ff)
+    QLineSeries *m_altGyroZ;        // Pink  (#f778ba)
+    QValueAxis  *m_gyroAxisX;       // Altitude (m)
+    QValueAxis  *m_gyroAxisY;       // Angular rate (°/s)
+
     int m_packetCount;
 };
-

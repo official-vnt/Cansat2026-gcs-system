@@ -10,7 +10,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
 # Find Qt modules
-find_package(Qt6 COMPONENTS Core Gui Widgets SerialPort Charts REQUIRED)
+find_package(Qt6 COMPONENTS Core Gui Widgets SerialPort Charts Quick QuickWidgets Quick3D REQUIRED)
 
 # Include directories
 include_directories(
@@ -54,4 +54,7 @@ target_link_libraries(app.gcs.system PRIVATE
     Qt6::Widgets
     Qt6::SerialPort
     Qt6::Charts
+    Qt6::Quick
+    Qt6::QuickWidgets
+    Qt6::Quick3D
 )
