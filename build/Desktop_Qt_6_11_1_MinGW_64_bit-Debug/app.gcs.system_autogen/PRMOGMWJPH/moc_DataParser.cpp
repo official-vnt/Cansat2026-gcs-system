@@ -42,13 +42,19 @@ template <> constexpr inline auto DataParser::qt_create_metaobjectdata<qt_meta_t
         "packetReceived",
         "",
         "TelemetryPacket",
-        "packet"
+        "packet",
+        "messageReceived",
+        "message"
     };
 
     QtMocHelpers::UintData qt_methods {
         // Signal 'packetReceived'
         QtMocHelpers::SignalData<void(const TelemetryPacket &)>(1, 2, QMC::AccessPublic, QMetaType::Void, {{
             { 0x80000000 | 3, 4 },
+        }}),
+        // Signal 'messageReceived'
+        QtMocHelpers::SignalData<void(const QString &)>(5, 2, QMC::AccessPublic, QMetaType::Void, {{
+            { QMetaType::QString, 6 },
         }}),
     };
     QtMocHelpers::UintData qt_properties {
@@ -74,6 +80,7 @@ void DataParser::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
     if (_c == QMetaObject::InvokeMetaMethod) {
         switch (_id) {
         case 0: _t->packetReceived((*reinterpret_cast<std::add_pointer_t<TelemetryPacket>>(_a[1]))); break;
+        case 1: _t->messageReceived((*reinterpret_cast<std::add_pointer_t<QString>>(_a[1]))); break;
         default: ;
         }
     }
@@ -91,6 +98,8 @@ void DataParser::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
     }
     if (_c == QMetaObject::IndexOfMethod) {
         if (QtMocHelpers::indexOfMethod<void (DataParser::*)(const TelemetryPacket & )>(_a, &DataParser::packetReceived, 0))
+            return;
+        if (QtMocHelpers::indexOfMethod<void (DataParser::*)(const QString & )>(_a, &DataParser::messageReceived, 1))
             return;
     }
 }
@@ -114,14 +123,14 @@ int DataParser::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 1)
+        if (_id < 2)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 1;
+        _id -= 2;
     }
     if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 1)
+        if (_id < 2)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 1;
+        _id -= 2;
     }
     return _id;
 }
@@ -130,5 +139,11 @@ int DataParser::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 void DataParser::packetReceived(const TelemetryPacket & _t1)
 {
     QMetaObject::activate<void>(this, &staticMetaObject, 0, nullptr, _t1);
+}
+
+// SIGNAL 1
+void DataParser::messageReceived(const QString & _t1)
+{
+    QMetaObject::activate<void>(this, &staticMetaObject, 1, nullptr, _t1);
 }
 QT_WARNING_POP

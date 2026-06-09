@@ -399,6 +399,7 @@ D:/NAKSHATRA/inspace_cansat_2026/gcs/app.gcs.system/src/gui/MainWindow.h
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/QHash
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/QIODevice
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/QList
+ mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/QMap
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/QMargins
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/QMetaType
  mdp:C:/Qt/6.11.1/mingw_64/include/QtCore/QObject

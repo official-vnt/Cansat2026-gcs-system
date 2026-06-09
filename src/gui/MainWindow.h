@@ -12,6 +12,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QProgressBar>
+#include <QMap>
 
 #include "core/SerialWorker.h"
 #include "core/DataParser.h"
@@ -37,6 +38,7 @@ private slots:
     void onPortClosed();
     void onPacketReceived(const TelemetryPacket &packet);
     void onErrorOccurred(const QString &error);
+    void onMessageReceived(const QString &message);
 
     // Mission Timer
     void onMissionTimerTick();
@@ -176,4 +178,34 @@ private:
     QLineSeries *m_altGyroZ;
     QValueAxis  *m_gyroAxisX;
     QValueAxis  *m_gyroAxisY;
+
+    // ── System Status & Alerts ────────────────────────────────────────────────
+    struct StatusItem {
+        QLabel *dot;
+        QLabel *name;
+        QLabel *value;
+    };
+    QMap<QString, StatusItem> m_statusItems;
+    void setupSystemStatus();
+    void updateSystemStatus();
+    void addAlert(const QString &text, const QString &type = "INFO");
+
+    QElapsedTimer m_lastPacketTimer;
+    QElapsedTimer m_lastImuUpdate;
+    QElapsedTimer m_lastBmpUpdate;
+    QElapsedTimer m_lastGpsUpdate;
+    bool m_prevValuesInitialized = false;
+    QVector3D m_prevAccel;
+    QVector3D m_prevGyro;
+    float m_prevPressure = 0.0f;
+    float m_prevTemperature = 0.0f;
+    double m_prevLatitude = 0.0;
+    double m_prevLongitude = 0.0;
+    float m_prevGpsAltitude = 0.0f;
+    bool m_sdLoggingConfirmed = false;
+    int m_firstPacketCount = -1;
+    int m_expectedPacketCount = 0;
+    int m_lostPacketsCount = 0;
+    float m_rssiVal = -65.0f;
+    float m_snrVal = 9.5f;
 };

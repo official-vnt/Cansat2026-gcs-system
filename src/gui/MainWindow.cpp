@@ -1,5 +1,6 @@
 #include "MainWindow.h"
 #include "CommandDef.h"
+#include "MapWidget.h"
 #include "ui_MainWindow.h"
 
 #include <QDateTime>
@@ -33,109 +34,130 @@ MainWindow::MainWindow(QWidget *parent)
       m_packetCount(0) {
   ui->setupUi(this);
 
-  // ── Global QSS (GitHub Dark / Cyberpunk) ──────────────────────────────
+  // ── Global QSS — Aerospace Professional Light Theme ─────────────────────
+  // Inspired by NASA Mission Control, SpaceX GCS, ISRO dashboards:
+  //   • Near-white base with cool-gray tint (not pure white)
+  //   • Deep navy accent (#003580) for structural elements
+  //   • Electric blue (#0057D9) for live data values
+  //   • Amber-orange (#E07B00) for warnings / mission ID
+  //   • Clean Segoe UI throughout
   this->setStyleSheet(
       "QMainWindow {"
-      "  background-color: #ffffff;"
+      "  background-color: #EEF1F5;"
       "}"
       "QWidget#centralwidget {"
-      "  background-color: #ffffff;"
+      "  background-color: #EEF1F5;"
       "}"
+      // Section panels — white cards with a left navy accent stripe
       "QGroupBox {"
       "  font-family: 'Segoe UI', sans-serif;"
-      "  font-size: 11px;"
+      "  font-size: 10px;"
       "  font-weight: 800;"
       "  text-transform: uppercase;"
-      "  letter-spacing: 1px;"
-      "  color: #0969da;"
-      "  border: 1px solid #d0d7de;"
-      "  border-radius: 8px;"
-      "  margin-top: 15px;"
-      "  padding: 10px;"
-      "  background-color: #ffffff;"
+      "  letter-spacing: 1.5px;"
+      "  color: #003580;"
+      "  border: 1px solid #C8D0DC;"
+      "  border-left: 3px solid #003580;"
+      "  border-radius: 6px;"
+      "  margin-top: 16px;"
+      "  padding: 10px 8px 8px 8px;"
+      "  background-color: #FFFFFF;"
       "}"
       "QGroupBox::title {"
       "  subcontrol-origin: margin;"
       "  subcontrol-position: top left;"
-      "  left: 15px;"
-      "  padding: 0 5px;"
-      "  color: #0969da;"
+      "  left: 12px;"
+      "  padding: 0 6px;"
+      "  color: #003580;"
+      "  background: #FFFFFF;"
       "}"
       "QLabel {"
-      "  color: #24292f;"
+      "  color: #1A2238;"
       "  font-family: 'Segoe UI', sans-serif;"
-      "  font-size: 12px;"
+      "  font-size: 11px;"
       "}"
+      // Combo boxes
       "QComboBox {"
-      "  background-color: #d0d7de;"
-      "  border: 1px solid #afb8c1;"
-      "  border-radius: 6px;"
-      "  padding: 5px 12px;"
-      "  color: #24292f;"
+      "  background-color: #FFFFFF;"
+      "  border: 1px solid #B0BBCC;"
+      "  border-radius: 4px;"
+      "  padding: 4px 10px;"
+      "  color: #1A2238;"
       "  font-family: 'Segoe UI', sans-serif;"
-      "  min-width: 110px;"
+      "  font-size: 11px;"
+      "  min-width: 100px;"
       "}"
       "QComboBox:hover {"
-      "  border-color: #0969da;"
+      "  border-color: #0057D9;"
       "}"
       "QComboBox::drop-down {"
       "  border: none;"
-      "  width: 20px;"
+      "  width: 18px;"
       "}"
       "QComboBox QAbstractItemView {"
-      "  background-color: #ffffff;"
-      "  border: 1px solid #afb8c1;"
-      "  color: #24292f;"
-      "  selection-background-color: #d0d7de;"
-      "  selection-color: #0969da;"
+      "  background-color: #FFFFFF;"
+      "  border: 1px solid #B0BBCC;"
+      "  color: #1A2238;"
+      "  selection-background-color: #E8F0FE;"
+      "  selection-color: #003580;"
       "}"
+      // Default buttons
       "QPushButton {"
-      "  background-color: #d0d7de;"
-      "  border: 1px solid #afb8c1;"
-      "  border-radius: 6px;"
-      "  padding: 6px 16px;"
-      "  color: #24292f;"
-      "  font-weight: bold;"
+      "  background-color: #FFFFFF;"
+      "  border: 1px solid #B0BBCC;"
+      "  border-radius: 4px;"
+      "  padding: 5px 14px;"
+      "  color: #1A2238;"
+      "  font-weight: 600;"
       "  font-family: 'Segoe UI', sans-serif;"
       "  text-transform: uppercase;"
-      "  font-size: 11px;"
+      "  font-size: 10px;"
+      "  letter-spacing: 0.5px;"
       "}"
       "QPushButton:hover {"
-      "  background-color: #afb8c1;"
-      "  border-color: #57606a;"
+      "  background-color: #E8F0FE;"
+      "  border-color: #0057D9;"
+      "  color: #003580;"
       "}"
       "QPushButton:pressed {"
-      "  background-color: #ffffff;"
+      "  background-color: #D0E2FF;"
       "}"
       "QPushButton:disabled {"
-      "  background-color: #ffffff;"
-      "  border-color: #d0d7de;"
-      "  color: #8c959f;"
+      "  background-color: #F3F5F7;"
+      "  border-color: #D8DDE5;"
+      "  color: #9AA3B0;"
       "}"
+      // CONNECT — green
       "QPushButton#connectButton {"
-      "  background-color: rgba(35, 134, 54, 0.15);"
-      "  border-color: rgba(46, 160, 67, 0.4);"
-      "  color: #1a7f37;"
+      "  background-color: #EAF6ED;"
+      "  border: 1px solid #2DA44E;"
+      "  color: #1A6B34;"
+      "  font-weight: 700;"
       "}"
       "QPushButton#connectButton:hover {"
-      "  background-color: rgba(35, 134, 54, 0.25);"
-      "  border-color: #2ea043;"
+      "  background-color: #D4EDDA;"
+      "  border-color: #1A6B34;"
       "}"
+      // DISCONNECT — red
       "QPushButton#disconnectButton {"
-      "  background-color: rgba(248, 81, 73, 0.1);"
-      "  border-color: rgba(248, 81, 73, 0.3);"
-      "  color: #cf222e;"
+      "  background-color: #FEF0EE;"
+      "  border: 1px solid #CF222E;"
+      "  color: #9E1B28;"
+      "  font-weight: 700;"
       "}"
       "QPushButton#disconnectButton:hover {"
-      "  background-color: rgba(248, 81, 73, 0.2);"
-      "  border-color: #cf222e;"
+      "  background-color: #FADDDA;"
+      "  border-color: #9E1B28;"
       "}"
+      // Status bar
       "QStatusBar {"
-      "  background-color: #ffffff;"
-      "  color: #57606a;"
-      "  border-top: 1px solid #d0d7de;"
+      "  background-color: #1A2238;"
+      "  color: #8A9BB5;"
+      "  font-family: 'Consolas', monospace;"
+      "  font-size: 10px;"
+      "  border-top: 2px solid #003580;"
       "}"
-      // Scroll areas — transparent so underlying dark background shows through
+      // Scroll areas
       "QScrollArea {"
       "  background: transparent;"
       "  border: none;"
@@ -144,31 +166,32 @@ MainWindow::MainWindow(QWidget *parent)
       "  background: transparent;"
       "}"
       "QScrollBar:vertical {"
-      "  background: #ffffff;"
-      "  width: 6px;"
+      "  background: #EEF1F5;"
+      "  width: 5px;"
       "  border-radius: 3px;"
       "}"
       "QScrollBar::handle:vertical {"
-      "  background: #afb8c1;"
+      "  background: #B0BBCC;"
       "  border-radius: 3px;"
       "  min-height: 20px;"
       "}"
       "QScrollBar::handle:vertical:hover {"
-      "  background: #0969da;"
+      "  background: #0057D9;"
       "}"
       "QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {"
       "  height: 0px;"
       "}"
-      // Chart views get the same card-style border as the telemetry cards
+      // Chart views — same card style
       "QChartView {"
-      "  border: 1px solid #d0d7de;"
+      "  border: 1px solid #C8D0DC;"
+      "  border-left: 3px solid #003580;"
       "  border-radius: 6px;"
-      "  background: #ffffff;"
+      "  background: #FFFFFF;"
       "}"
       "QChartView:hover {"
-      "  border-color: #0969da;"
+      "  border-color: #0057D9;"
+      "  border-left-color: #0057D9;"
       "}"
-      // QGraphicsView (base class) must not override the above
       "QGraphicsView {"
       "  background: transparent;"
       "}");
@@ -200,7 +223,10 @@ MainWindow::MainWindow(QWidget *parent)
   setupRecoveryPanel();
   setupLoggingPanel();
   setupStatePanel();
+  setupSystemStatus();
   setupConnections();
+
+  ui->statusbar->setVisible(false);
 
   m_worker->moveToThread(&m_serialThread);
   m_serialThread.start();
@@ -491,7 +517,8 @@ void MainWindow::setupLeftPanel() {
     valLabel->setStyleSheet("color: #0969da; font-weight: bold; font-size: "
                             "11px; background: transparent; border: none;");
     QVBoxLayout *v = new QVBoxLayout();
-    v->setSpacing(0);
+    v->setAlignment(Qt::AlignTop);
+    v->setSpacing(2);
     v->addWidget(nameLbl);
     v->addWidget(valLabel);
     return v;
@@ -791,6 +818,8 @@ void MainWindow::setupConnections() {
   connect(m_worker, &SerialWorker::dataReady, m_parser, &DataParser::parseData);
   connect(m_parser, &DataParser::packetReceived, this,
           &MainWindow::onPacketReceived);
+  connect(m_parser, &DataParser::messageReceived, this,
+          &MainWindow::onMessageReceived);
 
   // Mission timer
   connect(&m_missionTimer, &QTimer::timeout, this,
@@ -858,6 +887,20 @@ void MainWindow::onPortOpened() {
     m_lblPacketsStored->setText("0");
   if (m_lblStorageRemaining)
     m_lblStorageRemaining->setText("--");
+
+  // Reset trackers and alert
+  m_lastPacketTimer.invalidate();
+  m_lastImuUpdate.invalidate();
+  m_lastBmpUpdate.invalidate();
+  m_lastGpsUpdate.invalidate();
+  m_prevValuesInitialized = false;
+  m_sdLoggingConfirmed = false;
+  m_firstPacketCount = -1;
+  m_expectedPacketCount = 0;
+  m_lostPacketsCount = 0;
+
+  addAlert("Serial port connected", "INFO");
+  updateSystemStatus();
 }
 
 void MainWindow::onPortClosed() {
@@ -874,10 +917,86 @@ void MainWindow::onPortClosed() {
   // Update recording indicator
   if (m_lblRecordingDot)
     m_lblRecordingDot->setText("◌ STOPPED");
+
+  addAlert("Serial port disconnected", "WARNING");
+  updateSystemStatus();
 }
 
 void MainWindow::onPacketReceived(const TelemetryPacket &packet) {
   m_packetCount++;
+
+  m_lastPacketTimer.restart();
+
+  if (m_firstPacketCount == -1) {
+    m_firstPacketCount = packet.packetCount;
+    addAlert("Telemetry stream active", "INFO");
+  }
+
+  // Track expected vs received for packet loss
+  m_expectedPacketCount = packet.packetCount - m_firstPacketCount + 1;
+  if (m_expectedPacketCount < 1) m_expectedPacketCount = 1;
+  m_lostPacketsCount = m_expectedPacketCount - m_packetCount;
+  if (m_lostPacketsCount < 0) m_lostPacketsCount = 0;
+
+  // Track sensor updates
+  if (!m_prevValuesInitialized) {
+    m_prevAccel = packet.accel;
+    m_prevGyro = packet.gyro;
+    m_prevPressure = packet.pressure;
+    m_prevTemperature = packet.temperature;
+    m_prevLatitude = packet.latitude;
+    m_prevLongitude = packet.longitude;
+    m_prevGpsAltitude = packet.gpsAltitude;
+    m_prevValuesInitialized = true;
+
+    m_lastImuUpdate.start();
+    m_lastBmpUpdate.start();
+    m_lastGpsUpdate.start();
+  } else {
+    if (packet.accel != m_prevAccel || packet.gyro != m_prevGyro) {
+      m_lastImuUpdate.restart();
+      m_prevAccel = packet.accel;
+      m_prevGyro = packet.gyro;
+    }
+    if (packet.pressure != m_prevPressure || packet.temperature != m_prevTemperature) {
+      m_lastBmpUpdate.restart();
+      m_prevPressure = packet.pressure;
+      m_prevTemperature = packet.temperature;
+    }
+    if (packet.latitude != m_prevLatitude || packet.longitude != m_prevLongitude || packet.gpsAltitude != m_prevGpsAltitude) {
+      m_lastGpsUpdate.restart();
+      m_prevLatitude = packet.latitude;
+      m_prevLongitude = packet.longitude;
+      m_prevGpsAltitude = packet.gpsAltitude;
+    }
+  }
+
+  // Alerts logic
+  static bool gpsFixAlerted = false;
+  bool currentGpsFix = (packet.latitude != 0.0 && packet.longitude != 0.0 && packet.satellites > 3);
+  if (!currentGpsFix && !gpsFixAlerted && m_packetCount > 5) {
+    addAlert("GPS fix lost / insufficient satellites!", "WARNING");
+    gpsFixAlerted = true;
+  } else if (currentGpsFix && gpsFixAlerted) {
+    addAlert("GPS fix re-established", "INFO");
+    gpsFixAlerted = false;
+  }
+
+  static bool battAlerted = false;
+  if (packet.voltage < 6.5f && !battAlerted && packet.voltage > 0.0f) {
+    addAlert(QString("Low battery voltage: %1 V!").arg(packet.voltage, 0, 'f', 2), "ERROR");
+    battAlerted = true;
+  } else if (packet.voltage >= 6.5f && battAlerted) {
+    battAlerted = false;
+  }
+
+  // SD card confirmation from packet state or flight
+  if (packet.state.contains("SD") || packet.state == "FLIGHT") {
+    if (!m_sdLoggingConfirmed) {
+      m_sdLoggingConfirmed = true;
+      addAlert("SD Card active (flight state)", "INFO");
+    }
+  }
 
   // ── Update telemetry readout cards ──────────────────────────────────────
   if (m_lblTeamId)
@@ -1029,6 +1148,7 @@ void MainWindow::onPacketReceived(const TelemetryPacket &packet) {
 
   m_logger->logPacket(packet);
   updateCharts(packet);
+  updateSystemStatus();
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1130,56 +1250,76 @@ void MainWindow::onErrorOccurred(const QString &error) {
 //  Top Ribbon — style the pre-existing UI widgets from the .ui file
 // ─────────────────────────────────────────────────────────────────────────────
 void MainWindow::setupTopRibbon() {
+  // ── Dark aerospace mission-control header bar ──────────────────────────
   const QString ribbonStyle =
+      // The ribbon bar itself: clean white
       "QWidget#topRibbon {"
-      "  background-color: #ffffffff;"
-      "  border-bottom: 1px solid #e1e7f0ff;"
+      "  background: #FFFFFF;"
+      "  border-bottom: 2px solid #003580;"
       "}"
+      // Mission badge
       "QLabel#lblTeamIdBadge {"
-      "  color: #f0883e;"
-      "  font-family: 'Consolas', monospace;"
-      "  font-size: 13px;"
-      "  font-weight: bold;"
-      "  letter-spacing: 1px;"
-      "  padding: 0 8px;"
-      "}"
-      "QLabel#lblMissionTimer {"
-      "  color: #0969da;"
-      "  font-family: 'Consolas', monospace;"
-      "  font-size: 20px;"
-      "  font-weight: bold;"
-      "  letter-spacing: 2px;"
-      "  min-width: 110px;"
-      "}"
-      "QLabel#lblTimerCaption, QLabel#lblLinkCaption, "
-      "QLabel#lblRssiCaption, QLabel#lblSnrCaption {"
-      "  color: #57606a;"
-      "  font-size: 9px;"
-      "  font-weight: bold;"
-      "  text-transform: uppercase;"
-      "  letter-spacing: 1px;"
-      "}"
-      "QLabel#lblRssiVal, QLabel#lblSnrVal {"
-      "  color: #1a7f37;"
+      "  color: #D35400;"
       "  font-family: 'Consolas', monospace;"
       "  font-size: 12px;"
       "  font-weight: bold;"
-      "  min-width: 60px;"
+      "  letter-spacing: 1.5px;"
+      "  padding: 0 10px;"
+      "  border-right: 1px solid #C8D0DC;"
       "}"
-      "QFrame[frameShape='5'] {" // VLine separators
-      "  color: #afb8c1;"
+      // All caption labels inside the ribbon
+      "QLabel#lblTimerCaption, QLabel#lblLinkCaption, "
+      "QLabel#lblRssiCaption, QLabel#lblSnrCaption {"
+      "  color: #57606a;"
+      "  font-size: 8px;"
+      "  font-weight: bold;"
+      "  text-transform: uppercase;"
+      "  letter-spacing: 1.5px;"
+      "}"
+      // Mission elapsed timer — large digital readout
+      "QLabel#lblMissionTimer {"
+      "  color: #003580;"
+      "  font-family: 'Consolas', monospace;"
+      "  font-size: 18px;"
+      "  font-weight: bold;"
+      "  letter-spacing: 3px;"
+      "  min-width: 100px;"
+      "}"
+      // RSSI / SNR telemetry values
+      "QLabel#lblRssiVal, QLabel#lblSnrVal {"
+      "  color: #1A6B34;"
+      "  font-family: 'Consolas', monospace;"
+      "  font-size: 12px;"
+      "  font-weight: bold;"
+      "  min-width: 55px;"
+      "}"
+      // Generic labels inside ribbon get dark text
+      "QLabel {"
+      "  color: #1A2238;"
+      "  font-family: 'Segoe UI', sans-serif;"
+      "}"
+      // Vertical separators
+      "QFrame[frameShape='5'] {"
+      "  color: #C8D0DC;"
       "  max-width: 1px;"
       "}"
+      // Link quality progress bar
       "QProgressBar#linkQualityBar {"
-      "  background-color: #edededff;"
-      "  border: 1px solid #000000ff;"
+      "  background: #EEF1F5;"
+      "  border: 1px solid #C8D0DC;"
       "  border-radius: 3px;"
-      "  height: 8px;"
+      "  height: 6px;"
       "}"
       "QProgressBar#linkQualityBar::chunk {"
       "  background: qlineargradient(x1:0,y1:0,x2:1,y2:0,"
-      "    stop:0 #238636, stop:0.6 #2ea043, stop:1 #1a7f37);"
+      "    stop:0 #2DA44E, stop:1 #4ADE80);"
       "  border-radius: 3px;"
+      "}"
+      // Status label
+      "QLabel#statusLabel {"
+      "  color: #57606a;"
+      "  font-family: 'Consolas', monospace;"
+      "  font-size: 11px;"
       "}";
 
   ui->topRibbon->setStyleSheet(ribbonStyle);
@@ -1196,19 +1336,27 @@ void MainWindow::setupTopRibbon() {
 // ─────────────────────────────────────────────────────────────────────────────
 void MainWindow::setupCommandCenter() {
   QGridLayout *grid = ui->commandPanelLayout;
-  grid->setSpacing(3);
+  grid->setSpacing(4);
 
-  const QString btnBase = "QPushButton {"
-                          "  border-radius: 4px;"
-                          "  padding: 5px 4px;"
-                          "  font-size: 9px;"
-                          "  font-weight: bold;"
-                          "  font-family: 'Segoe UI';"
-                          "  text-align: center;"
-                          "}"
-                          "QPushButton:hover { opacity:0.85; }"
-                          "QPushButton:disabled { color: #8c959f; "
-                          "border-color: #afb8c1; background: transparent; }";
+  // Aerospace-style: solid filled buttons with strong color identity
+  const QString btnBase =
+      "QPushButton {"
+      "  border-radius: 3px;"
+      "  padding: 6px 4px;"
+      "  font-size: 9px;"
+      "  font-weight: 700;"
+      "  font-family: 'Segoe UI';"
+      "  letter-spacing: 0.5px;"
+      "  text-align: center;"
+      "  text-transform: uppercase;"
+      "}"
+      "QPushButton:hover { opacity: 0.9; }"
+      "QPushButton:pressed { padding-top: 7px; padding-bottom: 5px; }"
+      "QPushButton:disabled {"
+      "  color: #9AA3B0;"
+      "  border: 1px solid #D8DDE5;"
+      "  background: #F3F5F7;"
+      "}";
 
   const auto &cmds = CommandRegistry::commands();
   int col = 0, row = 0;
@@ -1216,31 +1364,19 @@ void MainWindow::setupCommandCenter() {
   for (const CommandDefinition &d : cmds) {
     QPushButton *btn = new QPushButton(d.label, ui->commandGroupBox);
     btn->setEnabled(d.enabled);
-    if (d.enabled) {
-      btn->setStyleSheet(
-          btnBase +
-          QString("QPushButton{color:%1;background:%2;border:1px solid %1;}")
-              .arg(d.color, d.bgColor));
-    } else {
-      btn->setStyleSheet(btnBase);
-    }
+    btn->setStyleSheet(btnBase);
 
     m_cmdButtons.append(btn);
     grid->addWidget(btn, row, col);
 
-    // Dynamically connect the button to send the serial command
     connect(btn, &QPushButton::clicked, this, [this, d]() {
       if (d.needsConfirm) {
         if (!confirmAction(d.label.trimmed()))
           return;
       }
-
-      // Send the command via the serial worker thread
       QByteArray cmdBytes = (d.serialCmd + "\n").toUtf8();
       QMetaObject::invokeMethod(m_worker, "sendData", Qt::QueuedConnection,
                                 Q_ARG(QByteArray, cmdBytes));
-
-      // Provide visual feedback
       QMessageBox::information(this, "Command Sent",
                                QString("Sent: %1").arg(d.serialCmd));
     });
@@ -1304,20 +1440,30 @@ void MainWindow::setupRecoveryPanel() {
 void MainWindow::setupLoggingPanel() {
   QVBoxLayout *layout = ui->loggingPanelLayout;
 
-  // Recording dot
-  m_lblRecordingDot = new QLabel("◌ IDLE", ui->loggingGroupBox);
+  // Recording status indicator
+  m_lblRecordingDot = new QLabel("◌  IDLE", ui->loggingGroupBox);
   m_lblRecordingDot->setStyleSheet(
-      "color:#cf222e; font-family:'Consolas'; font-weight:bold;"
-      " font-size:12px; letter-spacing:1px;");
+      "color: #9E1B28;"
+      " font-family: 'Consolas', monospace;"
+      " font-weight: bold;"
+      " font-size: 11px;"
+      " letter-spacing: 1.5px;"
+      " padding: 3px 6px;"
+      " background: #FFFFFF;"
+      " border: 1px solid #CF222E;"
+      " border-radius: 3px;");
   layout->addWidget(m_lblRecordingDot);
 
   auto makeRow = [&](const QString &label, QLabel *&val, const QString &init) {
     QHBoxLayout *row = new QHBoxLayout();
     QLabel *lbl = new QLabel(label, ui->loggingGroupBox);
-    lbl->setStyleSheet("color:#57606a; font-size:10px;");
+    lbl->setStyleSheet("color: #5A7399; font-size: 10px; font-weight: 600;");
     val = new QLabel(init, ui->loggingGroupBox);
-    val->setStyleSheet("color:#0969da; font-family:'Consolas'; font-size:11px; "
-                       "font-weight:bold;");
+    val->setStyleSheet(
+        "color: #003580;"
+        " font-family: 'Consolas', monospace;"
+        " font-size: 10px;"
+        " font-weight: bold;");
     val->setWordWrap(true);
     row->addWidget(lbl);
     row->addStretch();
@@ -1329,23 +1475,37 @@ void MainWindow::setupLoggingPanel() {
   makeRow("Packets Stored:", m_lblPacketsStored, "0");
   makeRow("Storage Remaining:", m_lblStorageRemaining, "--");
 
-  // Export buttons
+  // Export buttons — aerospace blue and green
   QPushButton *btnCsv = new QPushButton("Export CSV", ui->loggingGroupBox);
   btnCsv->setStyleSheet(
-      "QPushButton { color:#0969da; background:rgba(88,166,255,0.08);"
-      " border:1px solid rgba(88,166,255,0.3); border-radius:4px;"
-      " padding:5px; font-size:10px; font-weight:bold; }"
-      "QPushButton:hover { background:rgba(88,166,255,0.15); }");
+      "QPushButton {"
+      "  color: #003580;"
+      "  background: #FFFFFF;"
+      "  border: 1px solid #0057D9;"
+      "  border-radius: 3px;"
+      "  padding: 5px;"
+      "  font-size: 9px;"
+      "  font-weight: 700;"
+      "  letter-spacing: 0.5px;"
+      "}"
+      "QPushButton:hover { background: #E8F0FE; }");
   connect(btnCsv, &QPushButton::clicked, this, &MainWindow::onExportCsv);
   layout->addWidget(btnCsv);
 
   QPushButton *btnReport =
       new QPushButton("Export Report", ui->loggingGroupBox);
   btnReport->setStyleSheet(
-      "QPushButton { color:#1a7f37; background:rgba(63,185,80,0.08);"
-      " border:1px solid rgba(63,185,80,0.3); border-radius:4px;"
-      " padding:5px; font-size:10px; font-weight:bold; }"
-      "QPushButton:hover { background:rgba(63,185,80,0.15); }");
+      "QPushButton {"
+      "  color: #1A6B34;"
+      "  background: #FFFFFF;"
+      "  border: 1px solid #2DA44E;"
+      "  border-radius: 3px;"
+      "  padding: 5px;"
+      "  font-size: 9px;"
+      "  font-weight: 700;"
+      "  letter-spacing: 0.5px;"
+      "}"
+      "QPushButton:hover { background: #EAF6ED; }");
   connect(btnReport, &QPushButton::clicked, this, &MainWindow::onExportReport);
   layout->addWidget(btnReport);
 }
@@ -1363,6 +1523,7 @@ void MainWindow::onMissionTimerTick() {
                                    .arg(h, 2, 10, QChar('0'))
                                    .arg(m, 2, 10, QChar('0'))
                                    .arg(s, 2, 10, QChar('0')));
+  updateSystemStatus();
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1500,4 +1661,192 @@ void MainWindow::setupStatePanel() {
   hLayout->addWidget(m_lblStateLand);
 
   layout->addLayout(hLayout);
+}
+
+void MainWindow::setupSystemStatus() {
+  QVBoxLayout *layout = ui->systemStatusLayout;
+  if (!layout) return;
+
+  // Clear existing items in layout just in case
+  QLayoutItem *item;
+  while ((item = layout->takeAt(0)) != nullptr) {
+    if (item->widget()) delete item->widget();
+    delete item;
+  }
+
+  auto createStatusRow = [this, layout](const QString &compName) {
+    QWidget *row = new QWidget(ui->systemStatusBox);
+    QHBoxLayout *h = new QHBoxLayout(row);
+    h->setContentsMargins(0, 0, 0, 0);
+    h->setSpacing(8);
+
+    QLabel *dot = new QLabel("●", row);
+    dot->setStyleSheet("color: #9AA3B0; font-size: 14px; font-weight: bold;");
+    dot->setFixedWidth(15);
+
+    QLabel *name = new QLabel(compName, row);
+    name->setStyleSheet("font-family: 'Segoe UI'; font-size: 11px; font-weight: bold; color: #5A7399; text-transform: uppercase;");
+    name->setFixedWidth(90);
+
+    QLabel *val = new QLabel("Waiting...", row);
+    val->setStyleSheet("font-family: 'Segoe UI'; font-size: 11px; color: #1A2238;");
+
+    h->addWidget(dot);
+    h->addWidget(name);
+    h->addWidget(val);
+    h->addStretch();
+
+    layout->addWidget(row);
+
+    StatusItem sItem;
+    sItem.dot = dot;
+    sItem.name = name;
+    sItem.value = val;
+    m_statusItems[compName] = sItem;
+  };
+
+  createStatusRow("Sensors");
+  createStatusRow("GPS");
+  createStatusRow("Telemetry");
+  createStatusRow("SD Card");
+  createStatusRow("Battery");
+  createStatusRow("Radio Link");
+}
+
+void MainWindow::updateSystemStatus() {
+  bool isConnected = ui->disconnectButton->isEnabled();
+
+  // 1. Telemetry Status
+  bool telemetryOk = false;
+  if (isConnected && m_lastPacketTimer.isValid() && m_lastPacketTimer.elapsed() < 3000) {
+    telemetryOk = true;
+  }
+
+  // 2. Sensors Status
+  bool sensorsOk = false;
+  QString sensorDetails = "Offline";
+  if (isConnected && telemetryOk) {
+    bool imuOk = m_lastImuUpdate.isValid() && m_lastImuUpdate.elapsed() < 5000;
+    bool bmpOk = m_lastBmpUpdate.isValid() && m_lastBmpUpdate.elapsed() < 5000;
+    bool gpsOk = m_lastGpsUpdate.isValid() && m_lastGpsUpdate.elapsed() < 5000;
+    sensorsOk = imuOk && bmpOk && gpsOk;
+    if (sensorsOk) {
+      sensorDetails = "IMU, BMP, GPS active";
+    } else {
+      QStringList failed;
+      if (!imuOk) failed.append("IMU");
+      if (!bmpOk) failed.append("BMP");
+      if (!gpsOk) failed.append("GPS");
+      sensorDetails = failed.join(",") + " stale";
+    }
+  }
+
+  // 3. GPS Status
+  bool gpsOk = false;
+  QString gpsDetails = "No Fix";
+  if (isConnected && telemetryOk) {
+    int sats = m_lblSatellites ? m_lblSatellites->text().toInt() : 0;
+    double lat = m_lblLat ? m_lblLat->text().toDouble() : 0.0;
+    gpsOk = (lat != 0.0 && sats > 3);
+    if (gpsOk) {
+      gpsDetails = QString("Fix OK (%1 Sats)").arg(sats);
+    } else {
+      gpsDetails = QString("No Fix (%1 Sats)").arg(sats);
+    }
+  }
+
+  // 4. SD Card
+  bool sdOk = m_sdLoggingConfirmed;
+
+  // 5. Battery
+  bool batteryOk = false;
+  QString batteryDetails = "Offline";
+  if (isConnected && telemetryOk) {
+    float volt = m_lblVoltage ? m_lblVoltage->text().replace(" V", "").toFloat() : 0.0f;
+    batteryOk = (volt >= 6.5f);
+    batteryDetails = QString("%1 V (%2)").arg(volt, 0, 'f', 2).arg(batteryOk ? "Safe" : "LOW");
+  }
+
+  // 6. Radio Link
+  bool radioOk = false;
+  QString radioDetails = "Offline";
+  if (isConnected) {
+    int expected = m_expectedPacketCount;
+    int lost = m_lostPacketsCount;
+    float lossRate = 0.0f;
+    if (expected > 0) {
+      lossRate = (lost / (float)expected) * 100.0f;
+    }
+    radioOk = (m_rssiVal >= -85.0f && lossRate < 5.0f);
+    radioDetails = QString("RSSI: %1 dBm (Loss: %2%)").arg(static_cast<int>(m_rssiVal)).arg(lossRate, 0, 'f', 1);
+  }
+
+  // Helper to update visual row
+  auto updateRow = [this](const QString &name, bool ok, const QString &valText, bool warn = false) {
+    if (!m_statusItems.contains(name)) return;
+    StatusItem item = m_statusItems[name];
+    if (ok) {
+      item.dot->setStyleSheet("color: #2DA44E; font-size: 14px; font-weight: bold;"); // Green
+      item.value->setStyleSheet("font-family: 'Segoe UI'; font-size: 11px; color: #1A2238;");
+    } else if (warn) {
+      item.dot->setStyleSheet("color: #E07B00; font-size: 14px; font-weight: bold;"); // Amber
+      item.value->setStyleSheet("font-family: 'Segoe UI'; font-size: 11px; color: #E07B00; font-weight: bold;");
+    } else {
+      item.dot->setStyleSheet("color: #CF222E; font-size: 14px; font-weight: bold;"); // Red
+      item.value->setStyleSheet("font-family: 'Segoe UI'; font-size: 11px; color: #CF222E; font-weight: bold;");
+    }
+    item.value->setText(valText);
+  };
+
+  updateRow("Sensors", sensorsOk, isConnected ? (telemetryOk ? sensorDetails : "Stale") : "Offline");
+  updateRow("GPS", gpsOk, isConnected ? (telemetryOk ? gpsDetails : "No Fix") : "Offline");
+  updateRow("Telemetry", telemetryOk, isConnected ? (telemetryOk ? "Active" : "No Packets (3s+)") : "Offline");
+  updateRow("SD Card", sdOk, isConnected ? (sdOk ? "Confirmed" : "Not Confirmed") : "Offline");
+  updateRow("Battery", batteryOk, isConnected ? (telemetryOk ? batteryDetails : "Low") : "Offline");
+  updateRow("Radio Link", radioOk, isConnected ? radioDetails : "Offline");
+}
+
+void MainWindow::addAlert(const QString &text, const QString &type) {
+  QVBoxLayout *layout = ui->alertsLayout;
+  if (!layout) return;
+
+  QString timeStr = QDateTime::currentDateTime().toString("[hh:mm:ss] ");
+  QLabel *lbl = new QLabel(timeStr + text, ui->alertsBox);
+
+  if (type == "ERROR") {
+    lbl->setStyleSheet("color: #CF222E; font-family: 'Consolas', monospace; font-size: 10px; font-weight: bold;");
+  } else if (type == "WARNING") {
+    lbl->setStyleSheet("color: #E07B00; font-family: 'Consolas', monospace; font-size: 10px; font-weight: bold;");
+  } else {
+    lbl->setStyleSheet("color: #24292f; font-family: 'Consolas', monospace; font-size: 10px;");
+  }
+
+  layout->addWidget(lbl);
+
+  // Keep max 5 items
+  QList<QLabel*> labels;
+  for (int i = 0; i < layout->count(); ++i) {
+    if (QLabel *l = qobject_cast<QLabel*>(layout->itemAt(i)->widget())) {
+      labels.append(l);
+    }
+  }
+
+  if (labels.size() > 5) {
+    QLabel *oldest = labels.first();
+    layout->removeWidget(oldest);
+    delete oldest;
+  }
+}
+
+void MainWindow::onMessageReceived(const QString &message) {
+  QString msg = message.trimmed();
+  if (msg.isEmpty()) return;
+
+  addAlert("MSG: " + msg, "INFO");
+
+  if (msg.contains("SD_OK") || msg.contains("SD_INITIALIZED") || msg.contains("SD_WRITE") || msg.contains("SD_LOG_OK")) {
+    m_sdLoggingConfirmed = true;
+    addAlert("SD Card logging confirmation received from CanSat", "INFO");
+    updateSystemStatus();
+  }
 }

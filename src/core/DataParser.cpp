@@ -31,7 +31,7 @@ void DataParser::processLine(const QString &line)
     
     // We expect 18 parts
     if (parts.size() < 18) {
-        qWarning() << "Incomplete packet received:" << line;
+        emit messageReceived(line);
         return;
     }
 

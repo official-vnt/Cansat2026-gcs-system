@@ -28,6 +28,7 @@ D:/NAKSHATRA/inspace_cansat_2026/gcs/app.gcs.system/build/Desktop_Qt_6_11_1_MinG
   C:/Qt/6.11.1/mingw_64/include/QtCore/QHash \
   C:/Qt/6.11.1/mingw_64/include/QtCore/QIODevice \
   C:/Qt/6.11.1/mingw_64/include/QtCore/QList \
+  C:/Qt/6.11.1/mingw_64/include/QtCore/QMap \
   C:/Qt/6.11.1/mingw_64/include/QtCore/QMargins \
   C:/Qt/6.11.1/mingw_64/include/QtCore/QMetaType \
   C:/Qt/6.11.1/mingw_64/include/QtCore/QObject \

@@ -19,6 +19,8 @@ public:
 signals:
     // Emitted when a valid CSV line is parsed
     void packetReceived(const TelemetryPacket &packet);
+    // Emitted when a raw line is received
+    void messageReceived(const QString &message);
 
 private:
     QString m_buffer;
