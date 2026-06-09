@@ -1,4 +1,4 @@
-#include "MapWidget.h"
+﻿#include "MapWidget.h"
 #include <QPainter>
 #include <QNetworkRequest>
 #include <QUrl>
@@ -88,7 +88,7 @@ void MapWidget::paintEvent(QPaintEvent *event)
     painter.setRenderHint(QPainter::Antialiasing);
     
     // Draw background
-    painter.fillRect(rect(), QColor("#0d1117"));
+    painter.fillRect(rect(), QColor("#ffffff"));
     
     // Convert lat/lon to OSM tile coordinates
     double n = pow(2.0, m_zoom);
@@ -124,7 +124,7 @@ void MapWidget::paintEvent(QPaintEvent *event)
             } else {
                 requestTile(cxTile, cyTile, m_zoom);
                 // Draw a placeholder grid
-                painter.setPen(QColor("#30363d"));
+                painter.setPen(QColor("#afb8c1"));
                 painter.drawRect(startPx + dx * 256, startPy + dy * 256, 256, 256);
             }
         }

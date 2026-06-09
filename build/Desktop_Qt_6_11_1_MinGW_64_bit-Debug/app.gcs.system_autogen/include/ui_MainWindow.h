@@ -442,7 +442,7 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "GCS Telemetry Dashboard", nullptr));
-        lblTeamIdBadge->setText(QCoreApplication::translate("MainWindow", "TEAM: #123456789", nullptr));
+        lblTeamIdBadge->setText(QCoreApplication::translate("MainWindow", "TEAM: 2026-INSPACe-CANSAT-021", nullptr));
         label->setText(QCoreApplication::translate("MainWindow", "Port:", nullptr));
         label_2->setText(QCoreApplication::translate("MainWindow", "Baud:", nullptr));
         connectButton->setText(QCoreApplication::translate("MainWindow", "CONNECT", nullptr));
